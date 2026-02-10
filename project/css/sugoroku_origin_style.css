@@ -76,7 +76,7 @@ header h1 {
 /* ==========================================
    4. すごろく盤面（ボード）
    ========================================== */
-.board-wrapper {
+/* .board-wrapper {
     width: 100vw;
     margin-left: calc(-50vw + 50%);
     margin-right: calc(-50vw + 50%);
@@ -85,7 +85,7 @@ header h1 {
     justify-content: center;
     background: #f8f9fa;
     padding: 20px 0;
-}
+} */
 
 .board {
     display: grid;
@@ -97,9 +97,9 @@ header h1 {
     max-width: 1600px; /* 最大幅を増やす */
     min-width: 320px; /* スマホ最小幅 */
     aspect-ratio: 1 / 1; /* 正方形に近い盤面 */
-    background: #ffffff;
+    /* background: #ffffff; */
     /* 以下、background-imageはugokiに置換予定*/
-    background-image: url('../images/MicrosoftTeams-image.png');
+    /* background-image: url('../images/MicrosoftTeams-image.png'); */
     /* background-size: cover; */
     /* background-position: center; */
     /* background-repeat: no-repeat; */
