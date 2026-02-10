@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>双六ゲーム - プレイ人数選択</title>
+    <link rel="stylesheet" href="css/background_move.css" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <canvas id="fiber"></canvas>
+    <!-- ヘッダー -->
+    <header class="header">
+      <div class="header-content">
+        <div class="header-left">
+          <span class="header-title">
+            <a href="index.html">
+              <img class="header-img" src="images/takibi_logo.png" alt="" />
+            </a>
+          </span>
+        </div>
+
+        <!-- ハンバーガーメニューボタン -->
+        <button class="hamburger" id="hamburger" aria-label="メニュー">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ハンバーガーメニュー（オーバーレイ） -->
+    <nav class="menu-overlay" id="menuOverlay">
+      <div class="menu-content">
+        <button class="menu-close" id="menuClose" aria-label="閉じる">
+          &times;
+        </button>
+        <ul class="menu-list">
+          <li><a href="#about" class="menu-item">このサイトについて</a></li>
+          <li><a href="#ranking" class="menu-item">スコアランキング</a></li>
+          <li><a href="team.html" class="menu-item">作成者</a></li>
+          <li><a href="index.html" class="menu-item">ホームに戻る</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <main class="main-container">
+      <h1>(Game title)焚火のヴィジランテ</h1>
+      <div class="title-area">
+        <h1 class="game-title">クイズに正解して、ゴールを目指そう！</h1>
+      </div>
+
+      <!-- 選択カード -->
+      <div class="choice-card">
+        <div class="button-container">
+          <button class="choice-button solo-button" data-mode="solo">
+            あそぶ
+          </button>
+        </div>
+      </div>
+    </main>
+    <script src="js/script.js"></script>
+    <script src="js/background_move.js"></script>
+  </body>
+</html>

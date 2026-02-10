@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>双六ゲーム - キャラクター選択</title>
+    <link rel="stylesheet" href="css/background_move.css">
+    <link rel="stylesheet" href="css/character-selection.css">
+</head>
+<body>
+    <canvas id="fiber"></canvas>
+    <!-- ヘッダー -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <span class="header-title">
+                    <a href="index.html">
+                        <img class="header-img" src="images/takibi_logo.png" alt="">
+                    </a>
+                </span>
+            </div>
+            
+            <!-- ハンバーガーメニューボタン -->
+            <button class="hamburger" id="hamburger" aria-label="メニュー">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ハンバーガーメニュー（オーバーレイ） -->
+    <nav class="menu-overlay" id="menuOverlay">
+        <div class="menu-content">
+            <button class="menu-close" id="menuClose" aria-label="閉じる">&times;</button>
+            <ul class="menu-list">
+                <li><a href="#about" class="menu-item">このサイトについて</a></li>
+                <li><a href="#ranking" class="menu-item">スコアランキング</a></li>
+                <li><a href="team.html" class="menu-item">作成者</a></li>
+                <li><a href="index.html" class="menu-item">ホームに戻る</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <main class="main-container">
+        <div class="title-area">
+            <h1 class="game-title">双六ゲーム背景</h1>
+        </div>
+
+        <!-- キャラクター選択カード -->
+        <div class="character-card">
+    <div class="character-grid">
+        <div class="player-settings">
+            <div class="settings-group">
+                <label for="playerName" class="settings-label">
+                    <span class="label-icon">👤</span> プレイヤー名
+                </label>
+                <input 
+                    type="text" 
+                    id="playerName" 
+                    class="player-name-input" 
+                    placeholder="名前を入力してください"
+                    maxlength="20"
+                />
+            </div>
+
+            <div class="settings-group">
+                <label for="playerColor" class="settings-label">
+                    <span class="label-icon">🎨</span> アバターの色
+                </label>
+                <div class="color-picker-wrapper">
+                    <input 
+                        type="color" 
+                        id="playerColor" 
+                        class="color-picker-input" 
+                        value="#00BFFF"
+                    />
+                    <span class="color-value" id="colorValue">#00BFFF</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section right-info">
+    <div class="player-pin">
+        <svg class="player-avatar" id="playerAvatar" width="200" height="240" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+            <g id="avatarGroup">
+                <path id="avatarBody" d="M 60 140 L 40 120 L 35 120 L 45 80 
+                                     A 40 40 0 1 1 75 80 
+                                     L 85 120 L 80 120 Z" 
+                      fill="#00BFFF"/>
+                <circle cx="50" cy="45" r="12" fill="white" opacity="0.3"/>
+            </g>
+        </svg>
+    </div>
+</div>
+
+
+        <!-- プレイヤー設定エリア 
+        <div class="player-settings">
+            <div class="settings-group">
+                <label for="playerName" class="settings-label">
+                    <span class="label-icon">👤</span>
+                    プレイヤー名
+                </label>
+                <input 
+                    type="text" 
+                    id="playerName" 
+                    class="player-name-input" 
+                    placeholder="名前を入力してください"
+                    maxlength="20"
+                />
+            </div>
+        -->
+        </div>
+
+        <!-- STARTボタン -->
+        <div class="start-button-area">
+            <button class="start-button" id="startButton">
+                START
+            </button>
+        </div>
+    </main>
+    <script src="js/character-selection.js"></script>
+    <script src="js/background_move.js"></script>
+</body>
+</html>

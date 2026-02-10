@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>作成者紹介 - 焚火のヴィジランテ</title>
+    <link rel="stylesheet" href="css/background_move.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/creator.css" />
+  </head>
+  <body>
+    <canvas id="fiber"></canvas>
+    <header class="header">
+      <div class="header-content">
+        <div class="header-left">
+          <span class="header-title">
+            <a href="index.html">
+              <img class="header-img" src="images/takibi_logo.png" alt="ロゴ" />
+            </a>
+          </span>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="メニュー">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
+    </header>
+
+    <nav class="menu-overlay" id="menuOverlay">
+      <div class="menu-content">
+        <button class="menu-close" id="menuClose" aria-label="閉じる">
+          &times;
+        </button>
+        <ul class="menu-list">
+          <li><a href="#about" class="menu-item">このサイトについて</a></li>
+          <li><a href="#ranking" class="menu-item">スコアランキング</a></li>
+          <li><a href="team.html" class="menu-item">作成者</a></li>
+          <li><a href="index.html" class="menu-item">ホームに戻る</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="main-container">
+      <div class="title-area">
+        <h1 class="game-title">作成者紹介</h1>
+      </div>
+
+      <div class="creator-grid">
+        <div class="creator-card">
+          <div class="creator-icon">👤</div>
+          <h2 class="creator-name">メンバーA</h2>
+          <p class="creator-role">リーダー / プログラマー</p>
+          <p class="creator-comment">
+            ゲーム全体のシステム構築を担当しました。楽しんでプレイしてください！
+          </p>
+        </div>
+
+        <div class="creator-card">
+          <div class="creator-icon">🎨</div>
+          <h2 class="creator-name">メンバーB</h2>
+          <p class="creator-role">デザイナー</p>
+          <p class="creator-comment">
+            キャラクターや背景のデザインを担当。世界観を大切に制作しました。
+          </p>
+        </div>
+
+        <div class="creator-card">
+          <div class="creator-icon">✍️</div>
+          <h2 class="creator-name">メンバーC</h2>
+          <p class="creator-role">企画 / クイズ制作</p>
+          <p class="creator-comment">
+            面白いクイズをたくさん用意しました。全問正解を目指してみてください！
+          </p>
+        </div>
+
+        <div class="creator-card">
+          <div class="creator-icon">🛠️</div>
+          <h2 class="creator-name">メンバーD</h2>
+          <p class="creator-role">エンジニア</p>
+          <p class="creator-comment">
+            細かなUI調整やデバッグを担当。快適に遊べるよう努めました。
+          </p>
+        </div>
+      </div>
+
+      <div class="button-container">
+        <button class="choice-button" onclick="location.href = 'index.html'">
+          ホームへ戻る
+        </button>
+      </div>
+    </main>
+
+    <script src="js/script.js"></script>
+    <script src="js/background_move.js"></script>
+  </body>
+</html>
