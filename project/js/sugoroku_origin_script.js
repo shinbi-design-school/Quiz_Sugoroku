@@ -1,8 +1,7 @@
 // ===============================
-// 東京魅力すごろく - アドベンチャーマップ版
+// コードすごろく
 // ===============================
 
-// --- 元データ（供給元） - 50マス用に拡張 ---
 const masterData = [
   { type: 'start',    name: 'スタート',    icon: '' },
   { type: 'normal',   name: '&lt;a&gt;',       icon: '' },
@@ -10,13 +9,13 @@ const masterData = [
   { type: 'quiz',     name: 'コードクイズ', icon: '❓', quizId: 1 },
   { type: 'positive', name: '&lt;aside&gt;',      icon: '', effect: 2 },
   { type: 'normal',   name: '&lt;div&gt;',       icon: '' },
-  { type: 'hapning',  name: '&lt;footer&gt;',       icon: '', effect: -2 },
+  { type: 'happening',  name: '&lt;footer&gt;',       icon: '', effect: -2 },
   { type: 'normal',   name: '&lt;form&gt;',       icon: '' },
   { type: 'quiz',     name: 'コードクイズ', icon: '❓', quizId: 2 },
   { type: 'normal',   name: '&lt;header&gt;',       icon: '' },
   { type: 'positive', name: '&lt;input&gt;',       icon: '', effect: 3 },
   { type: 'normal',   name: '&lt;img&gt;',       icon: '' },
-  { type: 'hapning',  name: '&lt;label&gt;',    icon: '', effect: -1 },
+  { type: 'happening',  name: '&lt;label&gt;',    icon: '', effect: -1 },
   { type: 'normal',   name: '&lt;li&gt;',       icon: '' },
   { type: 'quiz',     name: 'コードクイズ', icon: '❓', quizId: 3 },
   { type: 'normal',   name: '&lt;main&gt;',     icon: '' },
@@ -27,13 +26,13 @@ const masterData = [
   { type: 'normal',   name: '&lt;section&gt;',       icon: '' },
   { type: 'positive', name: '&lt;select&gt;',     icon: '', effect: 1 },
   { type: 'normal',   name: '&lt;style&gt;',     icon: '' },
-  { type: 'hapning',  name: '&lt;table&gt;',    icon: '', effect: -1 },
+  { type: 'happening',  name: '&lt;table&gt;',    icon: '', effect: -1 },
   { type: 'normal',   name: '&lt;td&gt;',       icon: '' },
   { type: 'quiz',     name: 'コードクイズ', icon: '❓', quizId: 1 },
   { type: 'normal',   name: '&lt;textarea&gt;',       icon: '' },
   { type: 'positive', name: '&lt;th&gt;',       icon: '', effect: 2 },
   { type: 'normal',   name: '&lt;tr&gt;',     icon: '' },
-  { type: 'hapning',  name: '&lt;ul&gt;',     icon: '', effect: -2 },
+  { type: 'happening',  name: '&lt;ul&gt;',     icon: '', effect: -2 },
   { type: 'normal',   name: 'width',       icon: '' },
   { type: 'normal',   name: 'height',     icon: '' },
   { type: 'quiz',     name: 'コードクイズ', icon: '❓', quizId: 2 },
@@ -41,14 +40,14 @@ const masterData = [
   { type: 'positive', name: 'padding',       icon: '', effect: 1 },
   { type: 'normal',   name: 'if',       icon: '' },
   { type: 'normal',   name: 'const',     icon: '' },
-  { type: 'hapning',  name: 'foreach',     icon: '', effect: -1 },
+  { type: 'happening',  name: 'foreach',     icon: '', effect: -1 },
   { type: 'normal',   name: '$',     icon: '' },
   { type: 'quiz',     name: 'コードクイズ', icon: '❓', quizId: 3 },
   { type: 'normal',   name: 'echo',       icon: '' },
   { type: 'positive', name: 'create',     icon: '', effect: 2 },
   { type: 'normal',   name: 'read',     icon: '' },
   { type: 'normal',   name: 'update',       icon: '' },
-  { type: 'hapning',  name: 'delete',         icon: '☔', effect: -1 },
+  { type: 'happening',  name: 'delete',         icon: '', effect: -1 },
   { type: 'normal',   name: 'html',       icon: '' },
   { type: 'normal',   name: 'javascript',       icon: '' },
   { type: 'normal', name: 'php',     icon: '' },
@@ -60,7 +59,42 @@ const quizData = {
   2: { question: '.centerの文字を中央揃えにするには？', options: ['text-align: center;', 'margin: 0 auto;', 'display: block;', 'float: center;'], answer: 0, explanation: 'text-align: center; が中央揃えに使われます！' },
   3: { question: '変数を宣言するキーワードは？', options: ['var', 'let', 'const', 'static'], answer: 1, explanation: 'let が変数を宣言するキーワードです！' },
   4: { question: 'JavaScript の配列の要素数を取得するメソッドは？', options: ['length', 'size', 'count', 'total'], answer: 0, explanation: 'length プロパティで配列の要素数を取得できます！' },
-  5: { question: 'phpで文字列を結合する演算子は？', options: ['.', '+', '&', '&&'], answer: 0, explanation: 'phpではドット(.)で文字列を結合します！' }
+  5: { question: 'phpで文字列を結合する演算子は？', options: ['.', '+', '&', '&&'], answer: 0, explanation: 'phpではドット(.)で文字列を結合します！' },
+  6: { question: 'CSSで要素の背景色を設定するプロパティは？', options: ['color', 'background-color', 'border-color', 'text-color'], answer: 1, explanation: 'background-color が背景色を設定します！' },
+  7: { question: 'HTMLで画像を表示するタグは？', options: ['<img>', '<image>', '<picture>', '<src>'], answer: 0, explanation: '<img> タグが画像を表示します！' },
+  8: { question: 'JavaScriptで配列の要素を追加するメソッドは？', options: ['push()', 'pop()', 'shift()', 'unshift()'], answer: 0, explanation: 'push() メソッドで配列の末尾に要素を追加します！' },
+  9: { question: 'PHPで関数を定義するキーワードは？', options: ['function', 'def', 'func', 'declare'], answer: 0, explanation: 'function キーワードで関数を定義します！' },
+  10: { question: 'CSSでフォントサイズを指定するプロパティは？', options: ['font-size', 'text-size', 'font-style', 'text-style'], answer: 0, explanation: 'font-size プロパティでフォントサイズを指定します！' },
+  11: { question: 'HTMLでリンクを設定するタグは？', options: ['<a>', '<link>', '<href>', '<url>'], answer: 0, explanation: '<a> タグがリンクを設定します！' },
+  12: { question: 'JavaScriptで条件分岐を行うキーワードは？', options: ['if', 'switch', 'case', 'when'], answer: 0, explanation: 'if キーワードで条件分岐を行います！' },
+  13: { question: 'PHPで配列を作成する関数は？', options: ['array()', 'list()', 'set()', 'map()'], answer: 0, explanation: 'array() 関数で配列を作成します！' },
+  14: { question: 'CSSで要素の外側の余白を設定するプロパティは？', options: ['margin', 'padding', 'border', 'spacing'], answer: 0, explanation: 'margin プロパティで外側の余白を設定します！' },
+  15: { question: 'HTMLでフォームを作成するタグは？', options: ['<form>', '<input>', '<label>', '<button>'], answer: 0, explanation: '<form> タグがフォームを作成します！' },
+  16: { question: 'JavaScriptでループ処理を行うキーワードは？', options: ['for', 'while', 'do', 'foreach'], answer: 0, explanation: 'for キーワードでループ処理を行います！' },
+  17: { question: 'PHPで文字列の長さを取得する関数は？', options: ['strlen()', 'length()', 'size()', 'count()'], answer: 0, explanation: 'strlen() 関数で文字列の長さを取得します！' },
+  18: { question: 'CSSで要素の内側の余白を設定するプロパティは？', options: ['padding', 'margin', 'border', 'spacing'], answer: 0, explanation: 'padding プロパティで内側の余白を設定します！' },
+  19: { question: 'HTMLでテーブルの行を作成するタグは？', options: ['<tr>', '<td>', '<th>', '<table>'], answer: 0, explanation: '<tr> タグがテーブルの行を作成します！' },
+  20: { question: 'JavaScriptで関数を呼び出すキーワードは？', options: ['call', 'invoke', 'execute', 'run'], answer: 0, explanation: 'call キーワードで関数を呼び出します！' },
+  21: { question: 'PHPで連想配列を作成する関数は？', options: ['array()', 'list()', 'set()', 'map()'], answer: 0, explanation: 'array() 関数で連想配列を作成します！' },
+  22: { question: 'CSSで要素の枠線を設定するプロパティは？', options: ['border', 'margin', 'padding', 'outline'], answer: 0, explanation: 'border プロパティで枠線を設定します！' },
+  23: { question: 'HTMLで段落を作成するタグは？', options: ['<p>', '<div>', '<span>', '<section>'], answer: 0, explanation: '<p> タグが段落を作成します！' },
+  24: { question: 'JavaScriptでオブジェクトのプロパティにアクセスする方法は？', options: ['ドット記法', 'ブラケット記法', '両方', 'どちらでもない'], answer: 2, explanation: 'ドット記法とブラケット記法の両方でアクセスできます！' },
+  25: { question: 'PHPでコメントを記述する方法は？', options: ['// または /* */', '# または /* */', '<!-- -->', '-->'], answer: 0, explanation: '// または /* */ でコメントを記述します！' },
+  26: { question: 'CSSで要素の表示方法を設定するプロパティは？', options: ['display', 'position', 'float', 'visibility'], answer: 0, explanation: 'display プロパティで表示方法を設定します！' },
+  27: { question: 'HTMLでリストの各項目を作成するタグは？', options: ['<li>', '<ul>', '<ol>', '<item>'], answer: 0, explanation: '<li> タグがリストの各項目を作成します！' },
+  28: { question: 'JavaScriptで配列の要素を削除するメソッドは？', options: ['pop()', 'push()', 'shift()', 'unshift()'], answer: 0, explanation: 'pop() メソッドで配列の末尾の要素を削除します！' },
+  29: { question: 'PHPで条件分岐を行うキーワードは？', options: ['if', 'switch', 'case', 'when'], answer: 0, explanation: 'if キーワードで条件分岐を行います！' },
+  30: { question: 'CSSで要素のフォントファミリーを指定するプロパティは？', options: ['font-family', 'text-family', 'font-style', 'text-style'], answer: 0, explanation: 'font-family プロパティでフォントファミリーを指定します！' }, 
+  31: { question: 'HTMLでセクションを作成するタグは？', options: ['<section>', '<div>', '<span>', '<article>'], answer: 0, explanation: '<section> タグがセクションを作成します！' },
+  32: { question: 'JavaScriptで文字列を結合する演算子は？', options: ['+', '-', '*', '/'], answer: 0, explanation: '+ 演算子で文字列を結合します！' },
+  33: { question: 'PHPで配列の要素数を取得する関数は？', options: ['count()', 'length()', 'size()', 'total()'], answer: 0, explanation: 'count() 関数で配列の要素数を取得します！' },
+  34: { question: 'CSSで要素の位置を設定するプロパティは？', options: ['position', 'display', 'float', 'top'], answer: 0, explanation: 'position プロパティで位置を設定します！' },
+  35: { question: 'HTMLでフォームの入力フィールドを作成するタグは？', options: ['<input>', '<form>', '<label>', '<button>'], answer: 0, explanation: '<input> タグが入力フィールドを作成します！' },
+  36: { question: 'JavaScriptでループ処理を終了するキーワードは？', options: ['break', 'continue', 'exit', 'stop'], answer: 0, explanation: 'break キーワードでループ処理を終了します！' },
+  37: { question: 'PHPで文字列を大文字に変換する関数は？', options: ['strtoupper()', 'strtolower()', 'ucfirst()', 'lcfirst()'], answer: 0, explanation: 'strtoupper() 関数で文字列を大文字に変換します！' },
+  38: { question: 'CSSで要素の透明度を設定するプロパティは？', options: ['opacity', 'visibility', 'display', 'filter'], answer: 0, explanation: 'opacity プロパティで透明度を設定します！' },
+  39: { question: 'HTMLでテーブルの見出しセルを作成するタグは？', options: ['<th>', '<td>', '<tr>', '<table>'], answer: 0, explanation: '<th> タグが見出しセルを作成します！' },
+  40: { question: 'JavaScriptで関数を定義するキーワードは？', options: ['function', 'def', 'func', 'declare'], answer: 0, explanation: 'function キーワードで関数を定義します！' },
 };
 
 // --- 状態 ---
@@ -480,7 +514,7 @@ function handleSquareEvent(pos) {
         movePlayer(newPos, { triggerEvent: false });
       });
       break;
-    case 'hapning':
+    case 'happening':
       showEvent('💥', 'アクシデント！', `${tile.name}！\n${Math.abs(tile.effect)}マス戻ります...`, () => {
         const newPos = Math.max(pos + tile.effect, 0);
         movePlayer(newPos, { triggerEvent: false });

@@ -249,7 +249,7 @@ header p {
 .goal     { background: #FFD700; border-color: #FF6B00; animation: goalPulse 2s infinite; }
 .quiz     { background: #ffecd2; border-color: #FF6B6B; }
 .positive { background: #a1c4fd; border-color: #2196F3; }
-.hapning  { background: #fbc2eb; border-color: #9C27B0; }
+.happening  { background: #fbc2eb; border-color: #9C27B0; }
 
 @keyframes goalPulse { 
     0%, 100% { transform: scale(1); } 
