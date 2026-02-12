@@ -107,7 +107,8 @@ let gameState = {
   pendingMove: false,
   playerName: '',
   playerColor: '#00BFFF',
-  avatarPath: ''
+  avatarPath: '',
+  hapningCount: 0
 };
 
 // ========== URLパラメータからプレイヤー情報を取得 ==========
@@ -515,6 +516,7 @@ function handleSquareEvent(pos) {
       });
       break;
     case 'happening':
+      gameState.hapningCount++; // アクシデントマスのカウントを増やす
       showEvent('💥', 'アクシデント！', `${tile.name}！\n${Math.abs(tile.effect)}マス戻ります...`, () => {
         const newPos = Math.max(pos + tile.effect, 0);
         movePlayer(newPos, { triggerEvent: false });
@@ -576,6 +578,23 @@ function showGoal() {
   modal.classList.add('active');
 }
 
+function showResult() {
+  // 結果データをlocalStorageに保存
+  const resultData = {
+    playerName: gameState.playerName,
+    playerColor: gameState.playerColor,
+    avatarPath: gameState.avatarPath,
+    turnCount: gameState.turnCount,
+    quizCount: gameState.quizCleared.length,
+    hapningCount: gameState.hapningCount
+  };
+  
+  localStorage.setItem('gameResult', JSON.stringify(resultData));
+  
+  // result.htmlへ遷移
+  window.location.href = 'result.html';
+}
+
 function closeEventModal() {
   const modal = document.getElementById('eventModal');
   modal.classList.remove('active');
@@ -635,3 +654,4 @@ function initGame() {
 
 window.onload = initGame;
 window.resetGame = resetGame;
+window.showResult = showResult;

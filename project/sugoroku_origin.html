@@ -127,9 +127,21 @@
         <div class="modal-icon">🎉</div>
         <div class="modal-title">ゴール達成！</div>
         <div class="modal-message" id="goalMessage"></div>
-        <button class="btn btn-primary" onclick="resetGame()">
-          もう一度遊ぶ
-        </button>
+        <div
+          style="
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+          "
+        >
+          <button class="btn btn-primary" onclick="showResult()">
+            結果を見る
+          </button>
+          <button class="btn btn-secondary" onclick="resetGame()">
+            もう一度遊ぶ
+          </button>
+        </div>
       </div>
     </div>
     <!-- ダイスモーダル（画面中央にサイコロを表示） -->
@@ -181,10 +193,10 @@
       </div>
     </div>
     <div class="dice-section">
-        <button class="btn btn-primary" id="rollBtn" type="button">
-          サイコロを振る
-        </button>
-      </div>
+      <button class="btn btn-primary" id="rollBtn" type="button">
+        サイコロを振る
+      </button>
+    </div>
     <footer></footer>
     <script src="js/sugoroku_origin_script.js"></script>
     <script src="js/background_move.js"></script>
