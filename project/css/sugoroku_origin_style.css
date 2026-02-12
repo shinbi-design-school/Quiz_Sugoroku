@@ -52,6 +52,13 @@ header p {
     justify-content: center;
 }
 
+#rollBtn {
+  position: fixed;     /* 画面に対して固定位置に配置 */
+  bottom: 20px;        /* 下から20pxの距離 */
+  right: 20px;         /* 右から20pxの距離 */
+  z-index: 1000;       /* 他の要素（盤面や背景）より手前に表示 */
+}
+
 /* ==========================================
    3. メインレイアウト（ゲームエリア）
    ========================================== */
@@ -196,7 +203,7 @@ header p {
     background-image: url(../images/square_start.png);
     background-size: cover;
 }
-#square-49.square.goal.big {
+#square-48.square.goal.big {
     background-image: url(../images/suquare_goal.png);
     background-size: cover;
 }

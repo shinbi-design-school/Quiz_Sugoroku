@@ -51,7 +51,7 @@ const masterData = [
   { type: 'hapning',  name: 'delete',         icon: '☔', effect: -1 },
   { type: 'normal',   name: 'html',       icon: '' },
   { type: 'normal',   name: 'javascript',       icon: '' },
-  { type: 'positive', name: 'php',     icon: '', effect: 1 },
+  { type: 'normal', name: 'php',     icon: '' },
   { type: 'normal',   name: 'figma',       icon: '' },
 ];
 
@@ -187,16 +187,16 @@ function buildPathAndLayout() {
     
     // 中間マス（48個）を生成 (index 1-48)
     const rawData = masterData.filter(t => t.type !== 'start' && t.type !== 'goal');
-    for (let i = 0; i < 48; i++) {
+    for (let i = 0; i < 47; i++) {
         allTiles.push(rawData[i % rawData.length] || { type: 'normal', name: `点${i+1}`, icon: '📍' });
     }
     
-    // ゴールを追加 (index 49 = square-48の次)
+    // ゴールを追加 (index 48 = square-47の次)
     allTiles.push({ type: 'goal', name: '', icon: '' });
 
     // 2. S字配置の計算（7行、各行7マス）
-    // 行ごとのマス数パターン: 7, 7, 7, 7, 7, 7, 8 (最終行にゴール含む)
-    const rowPattern = [7, 7, 7, 7, 7, 7, 8]; // 合計50マス
+    // 行ごとのマス数パターン: 7, 7, 7, 7, 7, 7, 7 (最終行にゴール含む)
+    const rowPattern = [7, 7, 7, 7, 7, 7, 7]; // 合計50マス
     
     let currentIndex = 0;
     
@@ -230,11 +230,11 @@ function buildPathAndLayout() {
     console.log('');
     console.log('Position check:');
     console.log('Index 0 (Start):', allTiles[0].name, allTiles[0].type);
-    console.log('Index 48:', allTiles[48].name, allTiles[48].type);
-    console.log('Index 49 (Goal):', allTiles[49].name, allTiles[49].type);
+    console.log('Index 47:', allTiles[47].name, allTiles[47].type);
+    console.log('Index 48 (Goal):', allTiles[48].name, allTiles[48].type);
     console.log('');
     console.log('Last row (row 6) tiles:');
-    for (let i = 42; i <= 49; i++) {
+    for (let i = 42; i <= 47; i++) {
         console.log(`  Index ${i}:`, allTiles[i].name, allTiles[i].type);
     }
 }
@@ -298,7 +298,7 @@ function createBoard() {
     div.id = `square-${index}`;
 
     // 番号表示: goalは50番と表示
-    const displayNumber = tile.type === 'goal' ? 50 : (index + 1);
+    const displayNumber = tile.type === 'goal' ? 49 : (index + 1);
     
     div.innerHTML = `
       <span class="square-number">${displayNumber}</span>
