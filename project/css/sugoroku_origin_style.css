@@ -20,7 +20,7 @@ body {
    2. ヘッダーエリア
    ========================================== */
 header {
-    background: linear-gradient(135deg, rgba(237, 232, 228, 0.85) 0%, rgba(237, 232, 228, 0.85) 100%);
+    background: linear-gradient(135deg, rgba(237, 232, 228, 0.25) 0%, rgba(237, 232, 228, 0.25) 100%);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     color: white;
