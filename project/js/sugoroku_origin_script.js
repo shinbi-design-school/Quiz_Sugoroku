@@ -70,8 +70,76 @@ let gameState = {
   quizCleared: [],
   isRolling: false,
   diceValue: 0,
-  pendingMove: false
+  pendingMove: false,
+  playerName: '',
+  playerColor: '#00BFFF',
+  avatarPath: ''
 };
+
+// ========== URLパラメータからプレイヤー情報を取得 ==========
+function getPlayerDataFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const name = urlParams.get('name');
+  const color = urlParams.get('color');
+  const path = urlParams.get('path');
+  
+  // URLパラメータがない場合はlocalStorageから取得
+  if (name) {
+    gameState.playerName = name;
+  } else {
+    gameState.playerName = localStorage.getItem('playerName') || 'プレイヤー';
+  }
+  
+  if (color) {
+    gameState.playerColor = color;
+  } else {
+    gameState.playerColor = localStorage.getItem('playerColor') || '#00BFFF';
+  }
+  
+  if (path) {
+    gameState.avatarPath = path;
+  } else {
+    gameState.avatarPath = localStorage.getItem('avatarPath') || 'M 60 140 L 40 120 L 35 120 L 45 80 A 40 40 0 1 1 75 80 L 85 120 L 80 120 Z';
+  }
+  
+  console.log('プレイヤー情報:', {
+    name: gameState.playerName,
+    color: gameState.playerColor,
+    path: gameState.avatarPath
+  });
+}
+
+// ========== プレイヤーピンの色を更新 ==========
+function updatePlayerPinColor() {
+  const playerPin = document.getElementById('player-pin');
+  if (playerPin) {
+    // プレイヤーピンのSVGの色を変更
+    const avatarBody = playerPin.querySelector('path');
+    if (avatarBody) {
+      avatarBody.setAttribute('fill', gameState.playerColor);
+    }
+  }
+  
+  // プレイヤー名を表示（視認性向上版）
+  const playerNameElement = document.getElementById('player-name');
+  const playerColorElement = document.getElementById('player-color-display');
+  
+  if (playerNameElement) {
+    playerNameElement.textContent = gameState.playerName;
+    playerNameElement.style.color = gameState.playerColor;
+    playerNameElement.style.textShadow = `
+      0 0 10px rgba(0, 0, 0, 0.8),
+      0 0 20px rgba(0, 0, 0, 0.6),
+      2px 2px 4px rgba(0, 0, 0, 0.9)
+    `;
+    playerNameElement.style.fontWeight = 'bold';
+  }
+  
+  if (playerColorElement) {
+    playerColorElement.style.backgroundColor = gameState.playerColor;
+  }
+}
+
 
 // --- グローバル変数 ---
 let pathTiles = [];
@@ -242,7 +310,18 @@ function createBoard() {
       const pin = document.createElement('div');
       pin.className = 'player-pin';
       pin.id = 'player-pin';
-      pin.innerHTML = `<svg class="pin-svg" viewBox="0 0 34 45"><path d="M17 0C7.6 0 0 7.6 0 17c0 7.4 4.8 13.7 11.4 15.9L17 45l5.6-12.1C29.2 30.7 34 24.4 34 17 34 7.6 26.4 0 17 0z" fill="#FF6B6B"/><circle cx="17" cy="17" r="8" fill="white"/></svg>`;
+           // デフォルトのpathまたはカスタムpathを使用
+      const pathData = gameState.avatarPath || 'M 60 140 L 40 120 L 35 120 L 45 80 A 40 40 0 1 1 75 80 L 85 120 L 80 120 Z';
+      const pinColor = gameState.playerColor || '#FF6B6B';
+      
+      pin.innerHTML = `
+        <svg class="pin-svg" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+          <g>
+            <path d="${pathData}" fill="${pinColor}"/>
+            <circle cx="50" cy="45" r="12" fill="white" opacity="0.3"/>
+          </g>
+        </svg>
+      `;
       div.appendChild(pin);
     }
     boardEl.appendChild(div);
@@ -459,7 +538,7 @@ function showEvent(icon, title, message, callback) {
 
 function showGoal() {
   const modal = document.getElementById('goalModal');
-  document.getElementById('goalMessage').innerText = `おめでとうございます！\n${gameState.turnCount}ターンでゴールしました！`;
+  document.getElementById('goalMessage').innerText = `${gameState.playerName}さん、おめでとうございます！\n${gameState.turnCount}ターンでゴールしました！`;
   modal.classList.add('active');
 }
 
@@ -476,11 +555,15 @@ function initGame() {
     try {
         console.log('=== Game Initialization Started ===');
         console.log('boardEl:', boardEl);
+// プレイヤー情報を取得
+        getPlayerDataFromURL();
         
         createBoard();
         console.log('Board created');
         
-        updateInfo();
+        // プレイヤーピンの色を更新
+        updatePlayerPinColor();
+        console.log('Player pin color updated');updateInfo();
         console.log('Info updated');
         
         // 画面サイズ決定後に線を引く

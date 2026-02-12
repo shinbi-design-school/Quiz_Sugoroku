@@ -8,14 +8,14 @@ const menuItems = document.querySelectorAll('.menu-item');
 function openMenu() {
     menuOverlay.classList.add('active');
     hamburger.classList.add('active');
-    document.body.style.overflow = 'hidden'; // スクロール防止
+    document.body.style.overflow = 'hidden';
 }
 
 // メニューを閉じる
 function closeMenu() {
     menuOverlay.classList.remove('active');
     hamburger.classList.remove('active');
-    document.body.style.overflow = ''; // スクロール復元
+    document.body.style.overflow = '';
 }
 
 // ハンバーガーボタンクリック
@@ -30,31 +30,12 @@ hamburger.addEventListener('click', () => {
 // 閉じるボタンクリック
 menuClose.addEventListener('click', closeMenu);
 
-// オーバーレイ（背景）クリックで閉じる
+// オーバーレイクリックで閉じる
 menuOverlay.addEventListener('click', (e) => {
     if (e.target === menuOverlay) {
         closeMenu();
     }
 });
-
-// メニュー項目クリック時（ダミーリンクの処理）
-menuItems.forEach(item => {
-    item.addEventListener('click', (e) => { // デフォルトのリンク動作を防止
-        const href = item.getAttribute('href');
-        
-        // ダミーアラート表示
-        let message = '';
-        switch(href) {
-            case '#about':
-                message = 'このサイトについてページへ遷移します（ダミー）';
-                break;
-            case '#ranking':
-                message = 'スコアランキングページへ遷移します（ダミー）';
-                break;
-        }
-    });
-});
-// ========== ハンバーガーメニュー制御終了 ==========
 
 // Escキーでメニューを閉じる
 document.addEventListener('keydown', (e) => {
@@ -63,86 +44,211 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// ========== ボタンインタラクション ==========
-const choiceButtons = document.querySelectorAll('.choice-button');
+// ========== キャラクター選択 ==========
+const characterBoxes = document.querySelectorAll('.character-box');
+let selectedCharacter = null;
 
-// ボタンクリック時のアニメーション
-choiceButtons.forEach(button => {
-    button.addEventListener('click', function(e) {
-        const mode = this.getAttribute('data-mode');
+characterBoxes.forEach(box => {
+    box.addEventListener('click', function() {
+        // 既存の選択を解除
+        characterBoxes.forEach(b => b.classList.remove('selected'));
         
-        // --- リップル効果の作成 (既存のコード) ---
-        const ripple = document.createElement('span');
-        ripple.classList.add('ripple-effect');
-        const rect = this.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        const x = e.clientX - rect.left - size / 2;
-        const y = e.clientY - rect.top - size / 2;
-        ripple.style.width = ripple.style.height = size + 'px';
-        ripple.style.left = x + 'px';
-        ripple.style.top = y + 'px';
-        this.appendChild(ripple);
-        setTimeout(() => { ripple.remove(); }, 600);
+        // 新しい選択を適用
+        this.classList.add('selected');
+        selectedCharacter = this.getAttribute('data-character');
         
-        // --- 画面遷移の処理 (ここを修正) ---
+        console.log(`キャラクター ${selectedCharacter} を選択しました`);
+        
+        // 選択アニメーション
+        this.style.transform = 'scale(1.05)';
         setTimeout(() => {
-            // URLパラメータとしてモード（solo/multi）を渡すと、
-            // 次のページで「どちらが選ばれたか」を判別できるので便利です。
-            window.location.href = `select.html?mode=${mode}`;
-        }, 400); // アニメーションを見せるために少し遅延させています
+            this.style.transform = '';
+        }, 300);
+        
+        // STARTボタンの有効化チェック
+        checkStartButton();
     });
 });
+
+// ========== カラーピッカー制御 ==========
+document.addEventListener('DOMContentLoaded', () => {
+    const colorPicker = document.getElementById('playerColor');
+    const colorValueDisplay = document.getElementById('colorValue');
+    // IDでパスを特定するように変更
+    const avatarBody = document.getElementById('avatarBody');
+
+    if (colorPicker) {
+        // カラーピッカーの値が変更された時（スライド中も含む）の処理
+        colorPicker.addEventListener('input', (event) => {
+            const selectedColor = event.target.value;
+
+            // 1. カラーコードのテキスト表示を更新
+            if (colorValueDisplay) {
+                colorValueDisplay.textContent = selectedColor.toUpperCase();
+            }
+
+            // 2. SVGアバターの色を更新
+            if (avatarBody) {
+                avatarBody.setAttribute('fill', selectedColor);
+            }
+        });
+    }
+});
+
+// ========== プレイヤー名入力 ==========
+const playerNameInput = document.getElementById('playerName');
+
+// プレイヤー名の入力を監視
+playerNameInput.addEventListener('input', () => {
+    checkStartButton();
+});
+
+// エンターキーで決定
+playerNameInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        startGame();
+    }
+});
+
+// ========== STARTボタン制御 ==========
+const startButton = document.getElementById('startButton');
+
+// STARTボタンの有効/無効を判定
+function checkStartButton() {
+    const hasName = playerNameInput.value.trim().length > 0;
     
-    // マウスの動きに追従するホバー効果
-    button.addEventListener('mousemove', function(e) {
-        const rect = this.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+    if (hasName) {
+        startButton.disabled = false;
+        startButton.style.cursor = 'pointer';
+    } else {
+        startButton.disabled = true;
+        startButton.style.cursor = 'not-allowed';
+    }
+}
+
+// STARTボタンクリック
+startButton.addEventListener('click', startGame);
+
+// ゲーム開始処理
+function startGame() {
+    const playerName = playerNameInput.value.trim();
+    const colorPicker = document.getElementById('playerColor');
+    const playerColor = colorPicker.value;
+    
+    if (!playerName) {
+        alert('プレイヤー名を入力してください');
+        playerNameInput.focus();
+        return;
+    }
+    
+    // SVGのpathデータを取得
+    const avatarBody = document.getElementById('avatarBody');
+    const avatarPath = avatarBody ? avatarBody.getAttribute('d') : '';
+    
+    // ゲーム開始の確認
+    const gameData = {
+        playerName: playerName,
+        color: playerColor,
+        avatarPath: avatarPath
+    };
+    
+    console.log('ゲーム開始:', gameData);
+    
+    // localStorageにデータを保存（URLパラメータの代替/バックアップ）
+    localStorage.setItem('playerName', playerName);
+    localStorage.setItem('playerColor', playerColor);
+    localStorage.setItem('avatarPath', avatarPath);
+    
+    // アニメーション効果
+    startButton.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        startButton.style.transform = '';
         
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
+        // URLパラメータを使用してsugoroku_origin.htmlへ遷移
+        const params = new URLSearchParams({
+            name: playerName,
+            color: playerColor,
+            path: avatarPath
+        });
         
-        const deltaX = (x - centerX) / centerX;
-        const deltaY = (y - centerY) / centerY;
+        window.location.href = `sugoroku_origin.html?${params.toString()}`;
+    }, 200);
+}
+
+// ========== カラープリセット機能 ==========
+const colorPresets = [
+    { name: '青', color: '#00BFFF' },
+    { name: '赤', color: '#FF6B6B' },
+    { name: '緑', color: '#00B050' },
+    { name: '黄', color: '#FFC000' },
+    { name: '紫', color: '#764ba2' },
+    { name: 'ピンク', color: '#FF69B4' }
+];
+
+// プリセット色ボタンを作成（オプション）
+function createColorPresets() {
+    const wrapper = document.querySelector('.color-picker-wrapper');
+    const presetContainer = document.createElement('div');
+    presetContainer.className = 'color-presets';
+    presetContainer.style.cssText = `
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+    `;
+    
+    colorPresets.forEach(preset => {
+        const button = document.createElement('button');
+        button.className = 'preset-button';
+        button.style.cssText = `
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: transform 0.2s;
+            background-color: ${preset.color};
+        `;
+        button.title = preset.name;
         
-        this.style.transform = `translateY(-5px) rotateX(${-deltaY * 10}deg) rotateY(${deltaX * 10}deg)`;
+        button.addEventListener('click', () => {
+            const colorPicker = document.getElementById('playerColor');
+            const colorValueDisplay = document.getElementById('colorValue');
+            const avatarBody = document.getElementById('avatarBody');
+            
+            if (colorPicker) {
+                colorPicker.value = preset.color;
+            }
+            if (colorValueDisplay) {
+                colorValueDisplay.textContent = preset.color.toUpperCase();
+            }
+            if (avatarBody) {
+                avatarBody.setAttribute('fill', preset.color);
+            }
+        });
+        
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.2)';
+        });
+        
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+        
+        presetContainer.appendChild(button);
     });
     
-    // マウスが離れたら元に戻す
-    button.addEventListener('mouseleave', function() {
-        this.style.transform = '';
-    });
+    wrapper.parentElement.appendChild(presetContainer);
+}
 
-// リップル効果のCSSを動的に追加
-const style = document.createElement('style');
-style.textContent = `
-    .choice-button {
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .ripple-effect {
-        position: absolute;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.6);
-        transform: scale(0);
-        animation: ripple-animation 0.6s ease-out;
-        pointer-events: none;
-    }
-    
-    @keyframes ripple-animation {
-        to {
-            transform: scale(4);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);
+// プリセット色ボタンを作成
+createColorPresets();
 
-// ========== ページロード時のアニメーション ==========
+// ========== ページロードアニメーション ==========
 window.addEventListener('DOMContentLoaded', () => {
-    // カードのアニメーション遅延
-    const card = document.querySelector('.choice-card');
+    // カードのフェードイン
+    const card = document.querySelector('.character-card');
     card.style.opacity = '0';
     card.style.transform = 'translateY(30px)';
     
@@ -152,58 +258,37 @@ window.addEventListener('DOMContentLoaded', () => {
         card.style.transform = 'translateY(0)';
     }, 100);
     
-    // ボタンの順次表示
-    const buttons = document.querySelectorAll('.choice-button');
-    buttons.forEach((button, index) => {
-        button.style.opacity = '0';
-        button.style.transform = 'translateY(20px)';
+    // キャラクターボックスの順次表示
+    characterBoxes.forEach((box, index) => {
+        box.style.opacity = '0';
+        box.style.transform = 'scale(0.8)';
         
         setTimeout(() => {
-            button.style.transition = 'all 0.5s ease-out';
-            button.style.opacity = '1';
-            button.style.transform = 'translateY(0)';
-        }, 300 + (index * 150));
+            box.style.transition = 'all 0.5s ease-out';
+            box.style.opacity = '1';
+            box.style.transform = 'scale(1)';
+        }, 300 + (index * 100));
     });
+    
+    // プレイヤー設定エリアのフェードイン
+    const settings = document.querySelector('.player-settings');
+    settings.style.opacity = '0';
+    settings.style.transform = 'translateY(20px)';
+    
+    setTimeout(() => {
+        settings.style.transition = 'all 0.6s ease-out';
+        settings.style.opacity = '1';
+        settings.style.transform = 'translateY(0)';
+    }, 800);
+    
+    // STARTボタンの初期状態
+    checkStartButton();
 });
 
-// ========== ボタンホバー時の音響効果（オプション） ==========
-// Web Audio APIを使用した簡易的なホバー音
-let audioContext;
-let isAudioEnabled = false;
-
-// オーディオコンテキストの初期化（ユーザーインタラクション後）
-document.addEventListener('click', () => {
-    if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        isAudioEnabled = true;
-    }
-}, { once: true });
-
-// ホバー音の再生（軽い「ピッ」という音）
-function playHoverSound() {
-    if (!isAudioEnabled || !audioContext) return;
-    
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    oscillator.frequency.value = 800;
-    oscillator.type = 'sine';
-    
-    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-    
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.1);
-}
-
-// ボタンホバー時に音を鳴らす
-choiceButtons.forEach(button => {
-    button.addEventListener('mouseenter', playHoverSound);
-});
-
-console.log('双六ゲーム - プレイ人数選択画面を読み込みました');
-console.log('ハンバーガーメニュー: 有効');
-console.log('ボタンインタラクション: 有効');
+// ========== デバッグ情報 ==========
+console.log('双六ゲーム - キャラクター選択画面を読み込みました');
+console.log('利用可能な機能:');
+console.log('- プレイヤー名入力');
+console.log('- アバターカラー選択');
+console.log('- カラープリセット (6色)');
+console.log('- ハンバーガーメニュー');

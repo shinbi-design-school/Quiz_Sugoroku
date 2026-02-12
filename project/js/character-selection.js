@@ -94,18 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-    
-    // アニメーション効果
-    leftAvatar.style.transform = 'scale(1.2) rotate(10deg)';
-    rightAvatar.style.transform = 'scale(1.2) rotate(-10deg)';
-    
-    setTimeout(() => {
-        leftAvatar.style.transform = '';
-        rightAvatar.style.transform = '';
-    }, 300);
-    
-    // 初期色を設定
-updateAvatarColor(colorPicker.value);
 
 // ========== プレイヤー名入力 ==========
 const playerNameInput = document.getElementById('playerName');
@@ -129,9 +117,8 @@ const startButton = document.getElementById('startButton');
 // STARTボタンの有効/無効を判定
 function checkStartButton() {
     const hasName = playerNameInput.value.trim().length > 0;
-    const hasCharacter = selectedCharacter !== null;
     
-    if (hasName && hasCharacter) {
+    if (hasName) {
         startButton.disabled = false;
         startButton.style.cursor = 'pointer';
     } else {
@@ -146,6 +133,7 @@ startButton.addEventListener('click', startGame);
 // ゲーム開始処理
 function startGame() {
     const playerName = playerNameInput.value.trim();
+    const colorPicker = document.getElementById('playerColor');
     const playerColor = colorPicker.value;
     
     if (!playerName) {
@@ -154,36 +142,37 @@ function startGame() {
         return;
     }
     
-    if (!selectedCharacter) {
-        alert('キャラクターを選択してください');
-        return;
-    }
+    // SVGのpathデータを取得
+    const avatarBody = document.getElementById('avatarBody');
+    const avatarPath = avatarBody ? avatarBody.getAttribute('d') : '';
     
     // ゲーム開始の確認
     const gameData = {
         playerName: playerName,
-        character: selectedCharacter,
-        color: playerColor
+        color: playerColor,
+        avatarPath: avatarPath
     };
     
     console.log('ゲーム開始:', gameData);
+    
+    // localStorageにデータを保存（URLパラメータの代替/バックアップ）
+    localStorage.setItem('playerName', playerName);
+    localStorage.setItem('playerColor', playerColor);
+    localStorage.setItem('avatarPath', avatarPath);
     
     // アニメーション効果
     startButton.style.transform = 'scale(0.95)';
     setTimeout(() => {
         startButton.style.transform = '';
         
-        // ゲーム開始メッセージ
-        alert(
-            `ゲーム開始！\n\n` +
-            `プレイヤー名: ${playerName}\n` +
-            `キャラクター: Chara#${selectedCharacter}\n` +
-            `アバター色: ${playerColor}\n\n` +
-            `双六ゲーム画面へ遷移します...`
-        );
+        // URLパラメータを使用してsugoroku_origin.htmlへ遷移
+        const params = new URLSearchParams({
+            name: playerName,
+            color: playerColor,
+            path: avatarPath
+        });
         
-        // 実際のゲーム画面への遷移はここに実装
-        // window.location.href = 'game.html';
+        window.location.href = `sugoroku_origin.html?${params.toString()}`;
     }, 200);
 }
 
@@ -224,8 +213,19 @@ function createColorPresets() {
         button.title = preset.name;
         
         button.addEventListener('click', () => {
-            colorPicker.value = preset.color;
-            updateAvatarColor(preset.color);
+            const colorPicker = document.getElementById('playerColor');
+            const colorValueDisplay = document.getElementById('colorValue');
+            const avatarBody = document.getElementById('avatarBody');
+            
+            if (colorPicker) {
+                colorPicker.value = preset.color;
+            }
+            if (colorValueDisplay) {
+                colorValueDisplay.textContent = preset.color.toUpperCase();
+            }
+            if (avatarBody) {
+                avatarBody.setAttribute('fill', preset.color);
+            }
         });
         
         button.addEventListener('mouseenter', function() {
@@ -285,21 +285,9 @@ window.addEventListener('DOMContentLoaded', () => {
     checkStartButton();
 });
 
-// ========== アバターのホバー効果 ==========
-[leftAvatar, rightAvatar].forEach(avatar => {
-    avatar.addEventListener('mouseenter', function() {
-        this.style.transform = 'scale(1.2) rotate(10deg)';
-    });
-    
-    avatar.addEventListener('mouseleave', function() {
-        this.style.transform = '';
-    });
-});
-
 // ========== デバッグ情報 ==========
 console.log('双六ゲーム - キャラクター選択画面を読み込みました');
 console.log('利用可能な機能:');
-console.log('- キャラクター選択 (4種類)');
 console.log('- プレイヤー名入力');
 console.log('- アバターカラー選択');
 console.log('- カラープリセット (6色)');
