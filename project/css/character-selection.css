@@ -502,7 +502,7 @@ body {
 .color-value {
     font-size: 18px;
     font-weight: 700;
-    color: var(--text-dark);
+    color: #000000;
     font-family: 'Courier New', monospace;
     padding: 10px 15px;
     background: var(--white);
