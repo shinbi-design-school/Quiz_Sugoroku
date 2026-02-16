@@ -6,46 +6,46 @@ const masterData = [
   { type: 'start',    name: 'スタート',    icon: '' },
   { type: 'normal',   name: '&lt;a&gt;',       icon: '' },
   { type: 'normal',   name: '&lt;article&gt;', icon: '' },
-  { type: 'quiz',     name: 'クイズ', icon: '❓', quizId: 1 },
-  { type: 'positive', name: '&lt;aside&gt;',      icon: '', effect: 2 },
-  { type: 'normal',   name: '&lt;div&gt;',       icon: '' },
-  { type: 'happening',  name: '&lt;footer&gt;',       icon: '', effect: -2 },
+  { type: 'quiz',     name: '&lt;aside&gt;', icon: '❓', quizId: 1 },
+  { type: 'positive', name: '&lt;div&gt;',      icon: '', effect: 2 },
+  { type: 'normal',   name: '&lt;footer&gt;',       icon: '' },
+  { type: 'happening',  name: '',       icon: '', effect: -2 },
   { type: 'normal',   name: '&lt;form&gt;',       icon: '' },
-  { type: 'quiz',     name: 'クイズ', icon: '❓', quizId: 2 },
+  { type: 'quiz',     name: '&lt;label&gt;', icon: '❓', quizId: 2 },
   { type: 'normal',   name: '&lt;header&gt;',       icon: '' },
   { type: 'positive', name: '&lt;input&gt;',       icon: '', effect: 3 },
   { type: 'normal',   name: '&lt;img&gt;',       icon: '' },
-  { type: 'happening',  name: '&lt;label&gt;',    icon: '', effect: -1 },
+  { type: 'happening',  name: '',    icon: '', effect: -1 },
   { type: 'normal',   name: '&lt;li&gt;',       icon: '' },
-  { type: 'quiz',     name: 'クイズ', icon: '❓', quizId: 3 },
+  { type: 'quiz',     name: '&lt;option&gt;', icon: '❓', quizId: 3 },
   { type: 'normal',   name: '&lt;main&gt;',     icon: '' },
   { type: 'positive', name: '&lt;nav&gt;',  icon: '', effect: 2 },
   { type: 'normal',   name: '&lt;ol&gt;',     icon: '' },
-  { type: 'normal',   name: '&lt;option&gt;',     icon: '' },
+  { type: 'normal',   name: '',     icon: '' },
   { type: 'normal',   name: '&lt;p&gt;',     icon: '' },
   { type: 'normal',   name: '&lt;section&gt;',       icon: '' },
   { type: 'positive', name: '&lt;select&gt;',     icon: '', effect: 1 },
   { type: 'normal',   name: '&lt;style&gt;',     icon: '' },
   { type: 'happening',  name: '&lt;table&gt;',    icon: '', effect: -1 },
-  { type: 'normal',   name: '&lt;td&gt;',       icon: '' },
-  { type: 'quiz',     name: 'クイズ', icon: '❓', quizId: 1 },
+  { type: 'normal',   name: '',       icon: '' },
+  { type: 'quiz',     name: '&lt;td&gt;', icon: '❓', quizId: 1 },
   { type: 'normal',   name: '&lt;textarea&gt;',       icon: '' },
   { type: 'positive', name: '&lt;th&gt;',       icon: '', effect: 2 },
   { type: 'normal',   name: '&lt;tr&gt;',     icon: '' },
   { type: 'happening',  name: '&lt;ul&gt;',     icon: '', effect: -2 },
-  { type: 'normal',   name: 'width',       icon: '' },
+  { type: 'normal',   name: '',       icon: '' },
   { type: 'normal',   name: 'height',     icon: '' },
-  { type: 'quiz',     name: 'クイズ', icon: '❓', quizId: 2 },
+  { type: 'quiz',     name: 'width', icon: '❓', quizId: 2 },
   { type: 'normal',   name: 'margin',     icon: '' },
   { type: 'positive', name: 'padding',       icon: '', effect: 1 },
   { type: 'normal',   name: 'if',       icon: '' },
-  { type: 'normal',   name: 'const',     icon: '' },
+  { type: 'normal',   name: '',     icon: '' },
   { type: 'happening',  name: 'foreach',     icon: '', effect: -1 },
   { type: 'normal',   name: '$',     icon: '' },
-  { type: 'quiz',     name: 'クイズ', icon: '❓', quizId: 3 },
+  { type: 'quiz',     name: 'const', icon: '❓', quizId: 3 },
   { type: 'normal',   name: 'echo',       icon: '' },
   { type: 'positive', name: 'create',     icon: '', effect: 2 },
-  { type: 'normal',   name: 'read',     icon: '' },
+  { type: 'normal',   name: '',     icon: '' },
   { type: 'normal',   name: 'update',       icon: '' },
   { type: 'happening',  name: 'delete',         icon: '', effect: -1 },
   { type: 'normal',   name: 'html',       icon: '' },
@@ -217,17 +217,36 @@ function buildPathAndLayout() {
     allTiles.push({ type: 'start', name: '', icon: '' });
     
     // 2. クイズ(40問)とハプニング(7マス)を順番に配置
+    // masterDataから、スタートとゴール以外の「名前」を持つデータのみを抽出
+    const masterNames = masterData.filter(t => t.type !== 'start' && t.type !== 'goal');
+
     let qId = 1;
     let hCount = 0;
+    let mIdx = 0; // masterDataのインデックス管理用
+
     for (let i = 1; i <= 47; i++) {
+        // masterDataから順番に名前を取得（足りなくなったら最初に戻る）
+        const currentMaster = masterNames[mIdx % masterNames.length];
+        
         // 6マスごとにハプニングを配置
         if (i % 6 === 0 && hCount < 7) {
-            allTiles.push({ type: 'happening', name: 'アクシデント', icon: '💥', effect: -2 });
+            allTiles.push({ 
+                type: 'happening', 
+                name: currentMaster.name, // masterDataの名前を使用
+                icon: '💥', 
+                effect: -2 
+            });
             hCount++;
         } else if (qId <= 40) {
-            allTiles.push({ type: 'quiz', name: 'クイズ', icon: '❓', quizId: qId });
+            allTiles.push({ 
+                type: 'quiz', 
+                name: currentMaster.name, // masterDataの名前を使用
+                icon: '', 
+                quizId: qId 
+            });
             qId++;
         }
+        mIdx++;
     }
     
     // 3. ゴール(49マス目)
@@ -245,7 +264,6 @@ function buildPathAndLayout() {
             const tile = allTiles[currentIndex];
             let r = rIdx * 2;
             let c;
-            // S字の動き：偶数行は右へ、奇数行は左へ
             if (rIdx % 2 === 0) {
                 c = cIdx * 2;
             } else {
@@ -350,7 +368,7 @@ if (rollBtn && dice && diceModal) {
 function attemptMove(steps) {
   const target = gameState.currentPosition + steps;
   if (target >= boardDataLinear.length) {
-    showMessage('ゴールを超えてしまいます！', 'error');
+    showEvent('ゴールを超えてしまいます！', 'error');
     rollBtn.disabled = false;
     return;
   }
