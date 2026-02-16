@@ -91,8 +91,9 @@ body {
 }
 
 .player-name-display {
-    font-size: 2rem;
+    font-size: 3rem;
     font-weight: bold;
+    -webkit-text-stroke: #E0F6FF 0.3px;
 }
 
 .player-name-large {
@@ -109,7 +110,7 @@ body {
    ========================================== */
 .results-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 2fr));
     gap: 20px;
     margin-bottom: 30px;
 }
