@@ -214,7 +214,7 @@ function buildPathAndLayout() {
     const allTiles = [];
 
     // 1. スタート(1マス目)
-    allTiles.push({ type: 'start', name: 'START', icon: '🚩' });
+    allTiles.push({ type: 'start', name: '', icon: '' });
     
     // 2. クイズ(40問)とハプニング(7マス)を順番に配置
     let qId = 1;
@@ -231,7 +231,7 @@ function buildPathAndLayout() {
     }
     
     // 3. ゴール(49マス目)
-    allTiles.push({ type: 'goal', name: 'GOAL', icon: '🏆' });
+    allTiles.push({ type: 'goal', name: '', icon: '' });
 
     // 4. 配置計算 (7x7 = 49マス)
     const ROWS_COUNT = 7;

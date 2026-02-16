@@ -247,8 +247,7 @@ header p {
 /* マスのタイプ別カラー */
 .start    { background: #84fab0; border-color: #4CAF50; }
 .goal     { background: #FFD700; border-color: #FF6B00; animation: goalPulse 2s infinite; }
-.quiz     { background: #ffecd2; border-color: #FF6B6B; }
-.positive { background: #a1c4fd; border-color: #2196F3; }
+.quiz     { background: #ffffff; border-color: #FF6B6B; }
 .happening  { background: #fbc2eb; border-color: #9C27B0; }
 
 @keyframes goalPulse { 
@@ -310,8 +309,19 @@ header p {
 .face-5 .dot:nth-child(1) { grid-area: 1 / 1; } .face-5 .dot:nth-child(2) { grid-area: 1 / 3; }
 .face-5 .dot:nth-child(3) { grid-area: 2 / 2; }
 .face-5 .dot:nth-child(4) { grid-area: 3 / 1; } .face-5 .dot:nth-child(5) { grid-area: 3 / 3; }
-.face-6 { transform: rotateX(-90deg) translateZ(50px); }
-.face-6 .dot { grid-column: span 1; }
+.face-6 {
+    transform: rotateX(-90deg) translateZ(50px);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); 
+    grid-template-rows: repeat(3, 1fr);
+    place-items: center;
+    padding: 12px; /* ドットの間隔を調整 */
+}
+.face-6 .dot {
+    grid-column: span 1;
+    width: 16px;   /* ドットのサイズを適正化 */
+    height: 16px;
+}
 
 /* ==========================================
    6. ボタン & モーダル
