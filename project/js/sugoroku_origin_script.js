@@ -108,7 +108,7 @@ let gameState = {
   playerName: '',
   playerColor: '#00BFFF',
   avatarPath: '',
-  hapningCount: 0
+  happeningCount: 0
 };
 
 // ========== URLパラメータからプレイヤー情報を取得 ==========
@@ -208,114 +208,65 @@ function place(occ, r, c, span) {
   }
 }
 
-// --- 1. 盤面データの構築（ランダム配置） ---
-const ROWS = 14; // 7行 × 2列分（隙間用）
-const COLS = 14; // 7マス × 2列分（隙間用）
-
+// --- 盤面データの構築（49マス固定） ---
 function buildPathAndLayout() {
     pathTiles = [];
     const allTiles = [];
 
-    // 1. タイルリストの作成 (計50個)
-    // スタートを追加 (index 0)
-    allTiles.push({ type: 'start', name: '', icon: '' });
+    // 1. スタート(1マス目)
+    allTiles.push({ type: 'start', name: 'START', icon: '🚩' });
     
-    // 中間マス（48個）を生成 (index 1-48)
-    const rawData = masterData.filter(t => t.type !== 'start' && t.type !== 'goal');
-    for (let i = 0; i < 47; i++) {
-        allTiles.push(rawData[i % rawData.length] || { type: 'normal', name: `点${i+1}`, icon: '📍' });
+    // 2. クイズ(40問)とハプニング(7マス)を順番に配置
+    let qId = 1;
+    let hCount = 0;
+    for (let i = 1; i <= 47; i++) {
+        // 6マスごとにハプニングを配置
+        if (i % 6 === 0 && hCount < 7) {
+            allTiles.push({ type: 'happening', name: 'アクシデント', icon: '💥', effect: -2 });
+            hCount++;
+        } else if (qId <= 40) {
+            allTiles.push({ type: 'quiz', name: 'コードクイズ', icon: '❓', quizId: qId });
+            qId++;
+        }
     }
     
-    // ゴールを追加 (index 48 = square-47の次)
-    allTiles.push({ type: 'goal', name: '', icon: '' });
+    // 3. ゴール(49マス目)
+    allTiles.push({ type: 'goal', name: 'GOAL', icon: '🏆' });
 
-    // 2. S字配置の計算（7行、各行7マス）
-    // 行ごとのマス数パターン: 7, 7, 7, 7, 7, 7, 7 (最終行にゴール含む)
-    const rowPattern = [7, 7, 7, 7, 7, 7, 7]; // 合計50マス
-    
+    // 4. 配置計算 (7x7 = 49マス)
+    const ROWS_COUNT = 7;
+    const COLS_COUNT = 7;
     let currentIndex = 0;
-    
-    rowPattern.forEach((squaresInRow, rowIdx) => {
-        const r = rowIdx * 2; // 行の位置
-        
-        for (let colIdx = 0; colIdx < squaresInRow; colIdx++) {
+
+    for (let rIdx = 0; rIdx < ROWS_COUNT; rIdx++) {
+        for (let cIdx = 0; cIdx < COLS_COUNT; cIdx++) {
             if (currentIndex >= allTiles.length) break;
             
             const tile = allTiles[currentIndex];
+            let r = rIdx * 2;
             let c;
-            
-            // S字配置: 偶数行は左から右、奇数行は右から左
-            if (rowIdx % 2 === 0) {
-                c = colIdx * 2;
+            // S字の動き：偶数行は右へ、奇数行は左へ
+            if (rIdx % 2 === 0) {
+                c = cIdx * 2;
             } else {
-                c = (squaresInRow - 1 - colIdx) * 2;
+                c = (COLS_COUNT - 1 - cIdx) * 2;
             }
             
             pathTiles.push({ tile, r, c });
             currentIndex++;
         }
-    });
-
+    }
     boardDataLinear = pathTiles.map(p => p.tile);
-    
-    // デバッグ情報
-    console.log('=== Board Layout Debug ===');
-    console.log('Total tiles:', allTiles.length);
-    console.log('Row pattern:', rowPattern);
-    console.log('');
-    console.log('Position check:');
-    console.log('Index 0 (Start):', allTiles[0].name, allTiles[0].type);
-    console.log('Index 47:', allTiles[47].name, allTiles[47].type);
-    console.log('Index 48 (Goal):', allTiles[48].name, allTiles[48].type);
-    console.log('');
-    console.log('Last row (row 6) tiles:');
-    for (let i = 42; i <= 47; i++) {
-        console.log(`  Index ${i}:`, allTiles[i].name, allTiles[i].type);
-    }
 }
 
-// --- マスの中心を通る線を描画（レスポンシブ対応） ---
-function drawPathLines() {
-    const svg = document.getElementById('board-lines');
-    if (!svg) return;
-    svg.innerHTML = '';
-    
-    // boardのパディングを考慮
-    const boardRect = boardEl.getBoundingClientRect();
-    const boardStyle = window.getComputedStyle(boardEl);
-    const paddingLeft = parseFloat(boardStyle.paddingLeft);
-    const paddingTop = parseFloat(boardStyle.paddingTop);
-
-    for (let i = 0; i < pathTiles.length - 1; i++) {
-        const startEl = document.getElementById(`square-${i}`);
-        const endEl = document.getElementById(`square-${i + 1}`);
-
-        if (startEl && endEl) {
-            // マスの中心座標を取得（board内の相対座標）
-            const startRect = startEl.getBoundingClientRect();
-            const endRect = endEl.getBoundingClientRect();
-            
-            // board要素の左上を基準にした座標に変換
-            const x1 = startRect.left - boardRect.left + startRect.width / 2;
-            const y1 = startRect.top - boardRect.top + startRect.height / 2;
-            const x2 = endRect.left - boardRect.left + endRect.width / 2;
-            const y2 = endRect.top - boardRect.top + endRect.height / 2;
-
-            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', x1);
-            line.setAttribute('y1', y1);
-            line.setAttribute('x2', x2);
-            line.setAttribute('y2', y2);
-            svg.appendChild(line);
-        }
-    }
-}
-
-// --- 2. 盤面生成 & 線引き ---
+// --- 盤面生成 ---
 function createBoard() {
   if (!boardEl) return;
+  // 前の描画をクリア
   boardEl.innerHTML = '<svg id="board-lines" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1;"></svg>';
-  boardEl.style.setProperty('--cols', COLS);
+  
+  // --cols は 14 (7マス×2の間隔) に設定
+  boardEl.style.setProperty('--cols', 14);
 
   buildPathAndLayout();
 
@@ -323,40 +274,31 @@ function createBoard() {
     const { tile, r, c } = entry;
     const div = document.createElement('div');
     div.className = `square ${tile.type}`;
-    if (tile.type === 'start' || tile.type === 'goal') {
-      div.classList.add('big');
-    }
+    if (tile.type === 'start' || tile.type === 'goal') div.classList.add('big');
     
-    // グリッドでの配置は常に1x1（サイズはCSSのscaleで制御）
     div.style.gridRow = `${r + 1} / span 1`;
     div.style.gridColumn = `${c + 1} / span 1`;
     div.id = `square-${index}`;
 
-    // 番号表示: goalは50番と表示
-    const displayNumber = tile.type === 'goal' ? 49 : (index + 1);
+    // 番号を 1〜49 で表示
+    const displayNumber = index + 1;
     
     div.innerHTML = `
       <span class="square-number">${displayNumber}</span>
       <span class="square-icon">${tile.icon}</span>
-      <span class="square-name">${tile.name}</span>
+      <span class="square-name">${tile.name || ''}</span>
     `;
 
+    // プレイヤーの初期位置（スタート）
     if (index === 0) {
       const pin = document.createElement('div');
       pin.className = 'player-pin';
       pin.id = 'player-pin';
-           // デフォルトのpathまたはカスタムpathを使用
-      const pathData = gameState.avatarPath || 'M 60 140 L 40 120 L 35 120 L 45 80 A 40 40 0 1 1 75 80 L 85 120 L 80 120 Z';
-      const pinColor = gameState.playerColor || '#FF6B6B';
-      
+      const pinColor = gameState.playerColor || '#00BFFF';
       pin.innerHTML = `
-        <svg class="pin-svg" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
-          <g>
-            <path d="${pathData}" fill="${pinColor}"/>
-            <circle cx="50" cy="45" r="12" fill="white" opacity="0.3"/>
-          </g>
-        </svg>
-      `;
+        <svg class="pin-svg" viewBox="0 0 120 140">
+          <path d="${gameState.avatarPath}" fill="${pinColor}"/>
+        </svg>`;
       div.appendChild(pin);
     }
     boardEl.appendChild(div);
@@ -509,14 +451,8 @@ function movePlayer(target, options = { triggerEvent: true }) {
 function handleSquareEvent(pos) {
   const tile = boardDataLinear[pos];
   switch (tile.type) {
-    case 'positive':
-      showEvent('⭐', 'ラッキー！', `${tile.name}に到着！\n${tile.effect}マス進めます！`, () => {
-        const newPos = Math.min(pos + tile.effect, boardDataLinear.length - 1);
-        movePlayer(newPos, { triggerEvent: false });
-      });
-      break;
     case 'happening':
-      gameState.hapningCount++; // アクシデントマスのカウントを増やす
+      gameState.happeningCount++; // アクシデントマスのカウントを増やす
       showEvent('💥', 'アクシデント！', `${tile.name}！\n${Math.abs(tile.effect)}マス戻ります...`, () => {
         const newPos = Math.max(pos + tile.effect, 0);
         movePlayer(newPos, { triggerEvent: false });
@@ -586,7 +522,7 @@ function showResult() {
     avatarPath: gameState.avatarPath,
     turnCount: gameState.turnCount,
     quizCount: gameState.quizCleared.length,
-    hapningCount: gameState.hapningCount
+    happeningCount: gameState.happeningCount
   };
   
   localStorage.setItem('gameResult', JSON.stringify(resultData));
