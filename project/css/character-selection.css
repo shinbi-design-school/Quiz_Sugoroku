@@ -344,6 +344,8 @@ body {
 /* ========== プレイヤーアバター（SVG） ========== */
 .player-avatar {
     color: #00BFFF;
+    background-color: #fff;
+    border-radius: 10%;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
     transition: var(--transition);
 }
@@ -520,8 +522,8 @@ body {
 }
 
 .start-button {
-    background-color: var(--button-blue);
-    color: var(--white);
+    background-color: #fcff4c;
+    color: #333;
     font-size: 24px;
     font-weight: 700;
     padding: 20px 80px;
@@ -555,7 +557,8 @@ body {
 .start-button:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 30px rgba(44, 95, 124, 0.6);
-    background-color: #234a5e;
+    background-color: orange;
+    color: #333;
 }
 
 .start-button:active {
@@ -563,15 +566,17 @@ body {
 }
 
 .start-button:disabled {
-    background-color: #ccc;
+    background-color: var(--button-blue);
+    color: var(--white);
     cursor: not-allowed;
     box-shadow: none;
+    opacity: 0.8;
 }
 
 /* ========== レスポンシブ対応 ========== */
 /* @media (max-width: 1200px) { */
-    .info-section {
-        position: static;
+.info-section {
+    position: static;
         transform: none;
         margin: 20px auto;
         max-width: 400px;
