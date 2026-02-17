@@ -20,7 +20,7 @@ body {
    2. ヘッダーエリア
    ========================================== */
 header {
-    background: linear-gradient(135deg, rgba(237, 232, 228, 0.25) 0%, rgba(237, 232, 228, 0.25) 100%);
+    background: rgba(128, 128, 128, 0.6);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     color: white;
@@ -53,10 +53,30 @@ header p {
 }
 
 #rollBtn {
-  position: fixed;     /* 画面に対して固定位置に配置 */
-  bottom: 20px;        /* 下から20pxの距離 */
-  right: 20px;         /* 右から20pxの距離 */
-  z-index: 1000;       /* 他の要素（盤面や背景）より手前に表示 */
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  padding: 18px 50px;
+  font-size: 20px;
+  font-weight: 700;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  background-color: #FCFF4C;
+  color: #000000;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+#rollBtn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+#rollBtn:active {
+  transform: translateY(-2px) scale(0.98);
 }
 
 /* ==========================================
@@ -74,10 +94,14 @@ header p {
 }
 
 .info-panel {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
     display: flex;
-    justify-content: center;
     gap: 15px;
     flex-wrap: wrap;
+    z-index: 1000;
+    max-width: calc(100% - 200px);
 }
 
 .info-card {
@@ -134,13 +158,13 @@ header p {
     left: 0;
     width: 100%; 
     height: 100%;
-    z-index: 1;
+    z-index: 0;
     pointer-events: none;
 }
 
 #board-lines line {
-    stroke: #FFB347;
-    stroke-width: clamp(3px, 0.5vw, 5px); /* レスポンシブな線の太さ */
+    stroke: orange;
+    stroke-width: clamp(3px, 0.5vw, 5px);
     stroke-dasharray: 12, 8;
     opacity: 0.8;
 }
@@ -152,30 +176,43 @@ header p {
     z-index: 2;
     background: white;
     border: 2px solid #eef2f7;
-    border-radius: clamp(8px, 1vw, 12px); /* レスポンシブな角丸 */
-    font-size: clamp(0.7rem, 1.2vw, 1.1rem); /* フォントサイズ増加 */
+    border-radius: clamp(8px, 1vw, 12px);
+    font-size: clamp(0.7rem, 1.2vw, 1.1rem);
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
+    transform: scale(1.5);
 }
 
 .square.big {
     z-index: 3;
     aspect-ratio: 1 / 1;
-    transform: scale(1.4); /* 1.4倍に拡大 */
+    transform: scale(1.5);
     transform-origin: center;
 }
 
+.square.goal {
+    width: 151.8px;   
+    height: 151.8px;
+    transform: scale(1.5);
+    transform-origin: center;
+    z-index: 3;
+}
+
 .square:hover {
-    transform: scale(1.05);
+    transform: scale(1.55);
     border-color: #FF6B6B;
 }
 
 .square.big:hover {
-    transform: scale(1.45); /* ホバー時も1.4倍を維持 */
+    transform: scale(1.55);
+}
+
+.square.goal:hover {
+    transform: scale(1.55);
 }
 .square.start,.square.goal {
     background: #fff9db;
@@ -187,9 +224,10 @@ header p {
 }
 
 .square-name {
-    font-size: clamp(0.75rem, 1vw, 1rem); /* 名前サイズ増加 */
+    font-size: clamp(0.75rem, 1vw, 1rem);
     font-weight: bold;
     margin-top: 5px;
+    color: #000000;
 }
 
 .square-number {
@@ -204,6 +242,8 @@ header p {
     background-size: cover;
 }
 #square-48.square.goal.big {
+    width: 151.8px;
+    height: 151.8px;
     background-image: url(../images/suquare_goal.png);
     background-size: cover;
 }
@@ -260,8 +300,12 @@ header p {
    ========================================== */
 .dice-container {
     perspective: 1000px;
-    width: 100px;
-    height: 100px;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
 }
 
 .dice {
@@ -337,8 +381,8 @@ header p {
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-.btn-primary { background: #667eea; color: white; }
-.btn-primary:hover { background: #764ba2; transform: translateY(-2px); }
+.btn-primary { background: #ffffff; color: #000000; }
+.btn-primary:hover { background: #f0f0f0; }
 
 .modal {
     display: none;
@@ -380,6 +424,7 @@ header p {
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
+    color: #000000;
 }
 
 .quiz-option:hover {
@@ -391,6 +436,19 @@ header p {
 #quizModal .modal-content {
     max-width: 600px; 
     width: 95%;
+}
+
+.modal-message {
+    font-size: 1.8rem;
+    font-weight: bold;
+    line-height: 1.6;
+    margin: 20px 0;
+    color: #000000;
+}
+
+.modal-title {
+    font-size: 2rem;
+    font-weight: bold;
 }
 
 /* ==========================================
@@ -488,3 +546,4 @@ header p {
         margin-top: 2px;
     }
 }
+

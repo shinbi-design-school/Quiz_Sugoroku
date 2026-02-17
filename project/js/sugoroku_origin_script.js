@@ -470,7 +470,7 @@ function handleSquareEvent(pos) {
       break;
     case 'happening':
       gameState.happeningCount++; // アクシデントマスのカウントを増やす
-      showEvent('💥', 'アクシデント！', `${tile.name}！\n${Math.abs(tile.effect)}マス戻ります...`, () => {
+      showEvent('💥', 'アクシデント！', `${tile.name}\n${Math.abs(tile.effect)}マス戻ります...`, () => {
         const newPos = Math.max(pos + tile.effect, 0);
         movePlayer(newPos, { triggerEvent: false });
       });
@@ -500,6 +500,7 @@ function showQuiz(quizId) {
       if (idx === quiz.answer) {
         // --- 正解時 ---
         gameState.quizCleared.push(quizId);
+        updateInfo(); // 情報パネルを更新
         showEvent('🎊', '正解！', quiz.explanation, () => {
           rollBtn.disabled = false;
         });
@@ -507,15 +508,11 @@ function showQuiz(quizId) {
         // --- 不正解時 ---
         // モーダルが閉じるのを少し待ってからメッセージと移動を実行する
         setTimeout(() => {
-          // メッセージエリアに表示（type: 'error' で赤色などになる設定）
-          showEvent('残念！不正解です。2マス戻ります！', 'error');
-
-          // メッセージを読んでから移動させるため、さらに少し遅延させる
-          setTimeout(() => {
+          // メッセージエリアに表示
+          showEvent('❌', '', '残念！不正解です。<br>2マス戻ります！', () => {
             const backPos = Math.max(gameState.currentPosition - 2, 0);
-            // 第2引数 false で、戻った先で再度クイズがループするのを防ぐ
             movePlayer(backPos, { triggerEvent: false });
-          }, 1500); 
+          });
         }, 300);
       }
     };
@@ -528,7 +525,7 @@ function showEvent(icon, title, message, callback) {
   const modal = document.getElementById('eventModal');
   document.getElementById('eventIcon').textContent = icon;
   document.getElementById('eventTitle').textContent = title;
-  document.getElementById('eventMessage').textContent = message;
+  document.getElementById('eventMessage').innerHTML = message; // HTMLを解釈するためinnerHTMLに変更
   modal.classList.add('active');
   
   const closeHandler = () => {
@@ -622,3 +619,4 @@ function initGame() {
 window.onload = initGame;
 window.resetGame = resetGame;
 window.showResult = showResult;
+

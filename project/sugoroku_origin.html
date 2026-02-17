@@ -6,6 +6,7 @@
     <title>焚火ヴィジランテ</title>
     <link rel="stylesheet" href="css/background_move.css" />
     <link rel="stylesheet" href="css/sugoroku_origin_style.css" />
+    <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
     <canvas id="fiber"></canvas>
@@ -65,7 +66,7 @@
             <div class="value" id="turn-count">0</div>
           </div>
           <div class="info-card">
-            <div class="label">クイズ正解</div>
+            <div class="label">クイズ正解数</div>
             <div class="value"><span id="quiz-count">0</span></div>
           </div>
         </div>
@@ -104,10 +105,6 @@
         <div class="modal-title" id="quizModalTitle">コードクイズ</div>
         <div class="quiz-question" id="quizQuestion"></div>
         <div class="quiz-options" id="quizOptions"></div>
-        <!-- 閉じるボタンがあるとより良い -->
-        <button class="btn btn-secondary" type="button" data-close="quizModal">
-          閉じる
-        </button>
       </div>
     </div>
 
@@ -154,7 +151,17 @@
       aria-labelledby="diceModalTitle"
     >
       <div class="modal-content dice-modal-content" tabindex="-1">
-        <h2 class="sr-only" id="diceModalTitle">サイコロ</h2>
+        <h2
+          id="diceModalTitle"
+          style="
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #333;
+          "
+        >
+          何が出るかな？
+        </h2>
         <div class="dice-container">
           <div class="dice" id="dice">
             <div class="dice-face face-1"><div class="dot"></div></div>
@@ -197,6 +204,17 @@
         サイコロを振る
       </button>
     </div>
+
+    <!-- ホームに戻るボタン -->
+    <div
+      class="button-container"
+      style="text-align: center; margin: 40px 0; padding-bottom: 100px"
+    >
+      <button class="choice-button" onclick="location.href = 'index.html'">
+        ホームへ戻る
+      </button>
+    </div>
+
     <footer></footer>
     <script src="js/sugoroku_origin_script.js"></script>
     <script src="js/background_move.js"></script>

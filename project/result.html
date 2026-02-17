@@ -1,100 +1,107 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ゲーム結果 - 焚火ヴィジランテ</title>
-    <link rel="stylesheet" href="css/background_move.css">
-    <link rel="stylesheet" href="css/result.css">
-</head>
-<body>
+    <link rel="stylesheet" href="css/background_move.css" />
+    <link rel="stylesheet" href="css/result.css" />
+  </head>
+  <body>
     <canvas id="fiber"></canvas>
-    
+
     <!-- ヘッダー -->
     <header class="header">
-        <div class="header-content">
-            <h1>🎉 ゲーム結果 🎉</h1>
-        </div>
+      <div class="header-content">
+        <h1>🎉 ゲーム結果 🎉</h1>
+      </div>
     </header>
 
     <!-- メインコンテンツ -->
     <main class="main-container">
-        <div class="result-card">
-            <!-- プレイヤー情報 -->
-            <div class="player-info-section">
-                <div class="player-avatar-display">
-                    <svg class="result-avatar" id="resultAvatar" width="150" height="175" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
-                        <g id="resultAvatarGroup">
-                            <path id="resultAvatarBody" d="" fill="#00BFFF"/>
-                            <circle cx="50" cy="45" r="12" fill="white" opacity="0.3"/>
-                        </g>
-                    </svg>
-                </div>
-                <div class="player-name-section">
-                    <h2 class="congratulations">おめでとうございます！</h2>
-                    <div class="player-name-display">
-                        <span id="resultPlayerName" class="player-name-large"></span>
-                        <span>さん</span>
-                    </div>
-                </div>
+      <div class="result-card">
+        <!-- プレイヤー情報 -->
+        <div class="player-info-section">
+          <div class="player-avatar-display">
+            <svg
+              class="result-avatar"
+              id="resultAvatar"
+              width="150"
+              height="175"
+              viewBox="0 0 120 140"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <g id="resultAvatarGroup">
+                <path id="resultAvatarBody" d="" fill="#00BFFF" />
+                <circle cx="50" cy="45" r="12" fill="white" opacity="0.3" />
+              </g>
+            </svg>
+          </div>
+          <div class="player-name-section">
+            <h2 class="congratulations">おめでとうございます！</h2>
+            <div class="player-name-display">
+              <span id="resultPlayerName" class="player-name-large"></span>
+              <span>さん</span>
             </div>
-
-            <!-- 結果データ -->
-            <div class="results-grid">
-                <div class="result-item">
-                    <div class="result-icon">🏁</div>
-                    <div class="result-label">クリアターン数</div>
-                    <div class="result-value">
-                        <span id="resultTurnCount" class="result-number">0</span>
-                        <span class="result-unit">ターン</span>
-                    </div>
-                </div>
-
-                <div class="result-item">
-                    <div class="result-icon">❓</div>
-                    <div class="result-label">クイズ正解数</div>
-                    <div class="result-value">
-                        <span id="resultQuizCount" class="result-number">0</span>
-                        <span class="result-unit">/ 3問</span>
-                    </div>
-                </div>
-
-                <div class="result-item">
-                    <div class="result-icon">💥</div>
-                    <div class="result-label">アクシデント回数</div>
-                    <div class="result-value">
-                        <span id="resultHapningCount" class="result-number">0</span>
-                        <span class="result-unit">回</span>
-                    </div>
-                </div>
-
-                <div class="result-item">
-                    <div class="result-icon">⭐</div>
-                    <div class="result-label">総合評価</div>
-                    <div class="result-value">
-                        <span id="resultRank" class="result-rank">S</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- コメント -->
-            <div class="result-comment">
-                <p id="resultComment"></p>
-            </div>
-
-            <!-- ボタンエリア -->
-            <div class="button-area">
-                <button class="btn btn-primary" onclick="playAgain()">
-                    もう一度遊ぶ
-                </button>
-                <button class="btn btn-secondary" onclick="goToHome()">
-                    ホームに戻る
-                </button>
-            </div>
+          </div>
         </div>
+
+        <!-- 結果データ -->
+        <div class="results-grid">
+          <div class="result-item">
+            <div class="result-icon">🏁</div>
+            <div class="result-label">クリアターン数</div>
+            <div class="result-value">
+              <span id="resultTurnCount" class="result-number">0</span>
+              <span class="result-unit">ターン</span>
+            </div>
+          </div>
+
+          <div class="result-item">
+            <div class="result-icon">❓</div>
+            <div class="result-label">クイズ正解数</div>
+            <div class="result-value">
+              <span id="resultQuizCount" class="result-number">0</span>
+              <span class="result-unit">/ 3問</span>
+            </div>
+          </div>
+
+          <div class="result-item">
+            <div class="result-icon">💥</div>
+            <div class="result-label">アクシデント回数</div>
+            <div class="result-value">
+              <span id="resultHapningCount" class="result-number">0</span>
+              <span class="result-unit">回</span>
+            </div>
+          </div>
+
+          <div class="result-item">
+            <div class="result-icon">⭐</div>
+            <div class="result-label">総合評価</div>
+            <div class="result-value">
+              <span id="resultRank" class="result-rank">S</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- コメント -->
+        <div class="result-comment">
+          <p id="resultComment"></p>
+        </div>
+
+        <!-- ボタンエリア -->
+        <div class="button-area">
+          <button class="btn btn-primary" onclick="playAgain()">
+            もう一度遊ぶ
+          </button>
+          <button class="btn btn-secondary" onclick="goToHome()">
+            ホームに戻る
+          </button>
+        </div>
+      </div>
     </main>
 
     <script src="js/result.js"></script>
     <script src="js/background_move.js"></script>
-</body>
+  </body>
 </html>
