@@ -20,7 +20,7 @@ body {
    2. ヘッダーエリア
    ========================================== */
 header {
-    background: rgba(128, 128, 128, 0.6);
+    background: linear-gradient(135deg, rgba(237, 232, 228, 0.25) 0%, rgba(237, 232, 228, 0.25) 100%);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     color: white;
@@ -195,8 +195,6 @@ header p {
 }
 
 .square.goal {
-    width: 151.8px;   
-    height: 151.8px;
     transform: scale(1.5);
     transform-origin: center;
     z-index: 3;
@@ -242,8 +240,6 @@ header p {
     background-size: cover;
 }
 #square-48.square.goal.big {
-    width: 151.8px;
-    height: 151.8px;
     background-image: url(../images/suquare_goal.png);
     background-size: cover;
 }
@@ -546,4 +542,3 @@ header p {
         margin-top: 2px;
     }
 }
-
