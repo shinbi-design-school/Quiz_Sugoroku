@@ -10,7 +10,7 @@
     --card-yellow: #22173b;
     --bg-blue: #eaddca;
     --white: #fcff4c;
-    --text-dark: #000;
+    --text-dark: #fff;
     --shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -171,6 +171,7 @@ body {
     transition: var(--transition);
     position: relative;
     overflow: hidden;
+    color: #000;
 }
 
 .menu-item::before {
