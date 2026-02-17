@@ -52,9 +52,24 @@
 
       <!-- 選択カード -->
       <div class="choice-card">
-        <div class="button-container">
+        <div
+          class="button-container"
+          style="
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+          "
+        >
           <button class="choice-button solo-button" data-mode="solo">
-            あそぶ
+            ひとりであそぶ
+          </button>
+          <button
+            class="choice-button multi-button"
+            data-mode="multi"
+            onclick="location.href = 'members_select.html'"
+          >
+            みんなであそぶ
           </button>
         </div>
       </div>
