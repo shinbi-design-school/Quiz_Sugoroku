@@ -354,6 +354,134 @@ header p {
     pointer-events: none;
     animation: pinPulse 0.5s ease-in-out infinite alternate;
 }
+/* 多人数用: プレイヤーごとのオフセット（data-position で制御） */
+/* 1人の場合: 完全中央（デフォルト） */
+.player-pin[data-total="1"][data-position="center"] { 
+    transform: translate(-50%, -50%); 
+}
+
+/* 2人の場合: 左右に配置 */
+.player-pin[data-total="2"][data-position="left"] { 
+    transform: translate(calc(-50% - 7px), -50%); 
+}
+.player-pin[data-total="2"][data-position="right"] { 
+    transform: translate(calc(-50% + 7px), -50%); 
+}
+
+/* 3人の場合: 左・中央・右に均等配置 */
+.player-pin[data-total="3"][data-position="left"] { 
+    transform: translate(calc(-50% - 14px), -50%); 
+}
+.player-pin[data-total="3"][data-position="center"] { 
+    transform: translate(-50%, -50%); 
+}
+.player-pin[data-total="3"][data-position="right"] { 
+    transform: translate(calc(-50% + 14px), -50%); 
+}
+
+/* 4人の場合: 2x2グリッド配置 */
+.player-pin[data-total="4"][data-position="top-left"] { 
+    transform: translate(calc(-50% - 10px), calc(-50% - 8px)); 
+}
+.player-pin[data-total="4"][data-position="top-right"] { 
+    transform: translate(calc(-50% + 10px), calc(-50% - 8px)); 
+}
+.player-pin[data-total="4"][data-position="bottom-left"] { 
+    transform: translate(calc(-50% - 10px), calc(-50% + 8px)); 
+}
+.player-pin[data-total="4"][data-position="bottom-right"] { 
+    transform: translate(calc(-50% + 10px), calc(-50% + 8px)); 
+}
+
+@keyframes pinPulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.0);
+    }
+}
+
+/* pinPulseアニメーション中もオフセットを維持 */
+/* 1人用アニメーション */
+.player-pin[data-total="1"][data-position="center"] {
+    animation: pinPulse1_center 0.5s ease-in-out infinite alternate;
+}
+@keyframes pinPulse1_center {
+    0%   { transform: translate(-50%, -50%) scale(0.8); }
+    100% { transform: translate(-50%, -50%) scale(1.0); }
+}
+
+/* 2人用アニメーション */
+.player-pin[data-total="2"][data-position="left"] {
+    animation: pinPulse2_left 0.5s ease-in-out infinite alternate;
+}
+.player-pin[data-total="2"][data-position="right"] {
+    animation: pinPulse2_right 0.5s ease-in-out infinite alternate;
+}
+@keyframes pinPulse2_left {
+    0%   { transform: translate(calc(-50% - 7px), -50%) scale(0.8); }
+    100% { transform: translate(calc(-50% - 7px), -50%) scale(1.0); }
+}
+@keyframes pinPulse2_right {
+    0%   { transform: translate(calc(-50% + 7px), -50%) scale(0.8); }
+    100% { transform: translate(calc(-50% + 7px), -50%) scale(1.0); }
+}
+
+/* 3人用アニメーション */
+.player-pin[data-total="3"][data-position="left"] {
+    animation: pinPulse3_left 0.5s ease-in-out infinite alternate;
+}
+.player-pin[data-total="3"][data-position="center"] {
+    animation: pinPulse3_center 0.5s ease-in-out infinite alternate;
+}
+.player-pin[data-total="3"][data-position="right"] {
+    animation: pinPulse3_right 0.5s ease-in-out infinite alternate;
+}
+@keyframes pinPulse3_left {
+    0%   { transform: translate(calc(-50% - 14px), -50%) scale(0.8); }
+    100% { transform: translate(calc(-50% - 14px), -50%) scale(1.0); }
+}
+@keyframes pinPulse3_center {
+    0%   { transform: translate(-50%, -50%) scale(0.8); }
+    100% { transform: translate(-50%, -50%) scale(1.0); }
+}
+@keyframes pinPulse3_right {
+    0%   { transform: translate(calc(-50% + 14px), -50%) scale(0.8); }
+    100% { transform: translate(calc(-50% + 14px), -50%) scale(1.0); }
+}
+
+/* 4人用アニメーション */
+.player-pin[data-total="4"][data-position="top-left"] {
+    animation: pinPulse4_tl 0.5s ease-in-out infinite alternate;
+}
+.player-pin[data-total="4"][data-position="top-right"] {
+    animation: pinPulse4_tr 0.5s ease-in-out infinite alternate;
+}
+.player-pin[data-total="4"][data-position="bottom-left"] {
+    animation: pinPulse4_bl 0.5s ease-in-out infinite alternate;
+}
+.player-pin[data-total="4"][data-position="bottom-right"] {
+    animation: pinPulse4_br 0.5s ease-in-out infinite alternate;
+}
+@keyframes pinPulse4_tl {
+    0%   { transform: translate(calc(-50% - 10px), calc(-50% - 8px)) scale(0.8); }
+    100% { transform: translate(calc(-50% - 10px), calc(-50% - 8px)) scale(1.0); }
+}
+@keyframes pinPulse4_tr {
+    0%   { transform: translate(calc(-50% + 10px), calc(-50% - 8px)) scale(0.8); }
+    100% { transform: translate(calc(-50% + 10px), calc(-50% - 8px)) scale(1.0); }
+}
+@keyframes pinPulse4_bl {
+    0%   { transform: translate(calc(-50% - 10px), calc(-50% + 8px)) scale(0.8); }
+    100% { transform: translate(calc(-50% - 10px), calc(-50% + 8px)) scale(1.0); }
+}
+@keyframes pinPulse4_br {
+    0%   { transform: translate(calc(-50% + 10px), calc(-50% + 8px)) scale(0.8); }
+    100% { transform: translate(calc(-50% + 10px), calc(-50% + 8px)) scale(1.0); }
+}
+
+
 
 .pin-svg {
     width: 100%;
@@ -642,3 +770,4 @@ header p {
         margin-top: 2px;
     }
 }
+

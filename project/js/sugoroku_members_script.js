@@ -175,6 +175,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setTimeout(drawPathLines, 400);
   window.addEventListener('resize', () => setTimeout(drawPathLines, 250));
   buildPlayersList();
+  updatePinPositions(); // 初期配置のピン位置を更新
 
   // 先攻決めフェーズへ
   startOrderPhase();
@@ -249,14 +250,25 @@ function createBoard() {
 
   // 全プレイヤーのピンをスタートに配置
   const startSq = document.getElementById('square-0');
+  const totalPlayers = membersPlayers.length;
+  
+  // プレイヤー数に応じた配置位置を定義
+  const positionMaps = {
+    2: ['left', 'right'],
+    3: ['left', 'center', 'right'],
+    4: ['top-left', 'top-right', 'bottom-left', 'bottom-right']
+  };
+  
+  const positions = positionMaps[totalPlayers] || [];
+  
   membersPlayers.forEach((p, i) => {
     const pin = document.createElement('div');
     pin.className = 'player-pin';
     pin.id = 'player-pin-' + i;
-    const offset = (i - (membersPlayers.length - 1) / 2) * 14;
-    pin.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(calc(-50% + ' + offset + 'px),-50%);z-index:' + (10 + i) + ';';
+    pin.setAttribute('data-total', totalPlayers); // 総プレイヤー数
+    pin.setAttribute('data-position', positions[i] || 'center'); // 配置位置
     pin.innerHTML =
-      '<svg class="pin-svg" viewBox="0 0 120 140" style="width:28px;height:28px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4));">' +
+      '<svg class="pin-svg" viewBox="0 0 120 140">' +
       '<path d="' + (p.avatarPath || AVATAR_PATH) + '" fill="' + p.color + '"/>' +
       '<circle cx="50" cy="45" r="12" fill="white" opacity="0.3"/></svg>';
     if (startSq) startSq.appendChild(pin);
@@ -517,6 +529,37 @@ function attemptMove(steps) {
   movePlayer(target, { triggerEvent: true, countTurn: true });
 }
 
+
+// ===================================================
+// ピン位置更新：各squareごとのピン数をカウントして配置を調整
+// ===================================================
+function updatePinPositions() {
+  // 全squareをスキャンして、各squareに何個のピンがあるかカウント
+  const squares = document.querySelectorAll('.square');
+  
+  squares.forEach(function(square) {
+    const pinsInSquare = square.querySelectorAll('.player-pin');
+    const pinCount = pinsInSquare.length;
+    
+    if (pinCount === 0) return;
+    
+    // 各squareごとにピンの配置を更新
+    const positionMaps = {
+      1: ['center'],
+      2: ['left', 'right'],
+      3: ['left', 'center', 'right'],
+      4: ['top-left', 'top-right', 'bottom-left', 'bottom-right']
+    };
+    
+    const positions = positionMaps[pinCount] || ['center'];
+    
+    pinsInSquare.forEach(function(pin, index) {
+      pin.setAttribute('data-total', pinCount);
+      pin.setAttribute('data-position', positions[index] || 'center');
+    });
+  });
+}
+
 function movePlayer(target, options) {
   options = options || { triggerEvent: true, countTurn: true };
   var cur     = gameState.currentPosition;
@@ -527,6 +570,7 @@ function movePlayer(target, options) {
   if (step === 0) {
     if (options.countTurn) gameState.turnCount++;
     updateInfo();
+    updatePinPositions(); // 同じ位置でも配置を更新
     if (options.triggerEvent) {
       handleSquareEvent(target);
     } else if (options.afterMove) {
@@ -540,12 +584,14 @@ function movePlayer(target, options) {
     var sq   = document.getElementById('square-' + next);
     if (sq && pin) {
       sq.appendChild(pin);
+      updatePinPositions(); // 1マス移動するたびに配置を更新
       sq.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
     }
     if (next === target) {
       gameState.currentPosition = target;
       if (options.countTurn) gameState.turnCount++;
       updateInfo();
+      updatePinPositions(); // 最終位置でも更新
       setTimeout(function() {
         if (options.triggerEvent) {
           handleSquareEvent(target);
@@ -557,6 +603,7 @@ function movePlayer(target, options) {
       setTimeout(function() { animate(next); }, 300);
     }
   }
+  updatePinPositions(); // アニメーション開始前に初期配置を更新
   animate(cur);
 }
 
