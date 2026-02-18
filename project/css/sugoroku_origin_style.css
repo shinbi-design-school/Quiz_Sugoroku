@@ -212,13 +212,8 @@ header p {
 .square.goal:hover {
     transform: scale(1.55);
 }
-.square.start,.square.goal {
-    background: #fff9db;
-    border-color: #fab005;
-}
-
 .square-icon {
-    font-size: clamp(1.5rem, 2.5vw, 2.5rem); /* アイコンサイズ増加 */
+    font-size: clamp(1.5rem, 2.5vw, 2.5rem); 
 }
 
 .square-name {
@@ -232,7 +227,7 @@ header p {
     position: absolute;
     top: 5px; 
     left: 5px;
-    font-size: clamp(9px, 0.9vw, 12px); /* 番号サイズ増加 */
+    font-size: clamp(9px, 0.9vw, 12px);
     color: #888;
 }
 #square-0.square.start.big {
@@ -286,10 +281,12 @@ header p {
 .quiz     { background: #ffffff; border-color: #FF6B6B; }
 .happening  { background: #fbc2eb; border-color: #9C27B0; }
 
-@keyframes goalPulse { 
-    0%, 100% { transform: scale(1); } 
-    50% { transform: scale(1.03); } 
+
+@keyframes goalPulse {
+  0%, 100% { transform: scale(1.5); }
+  50% { transform: scale(1.55); }
 }
+
 
 /* ==========================================
    5. サイコロ (3D)
