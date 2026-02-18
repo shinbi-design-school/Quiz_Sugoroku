@@ -140,7 +140,7 @@ body {
     background: transparent;
     border: none;
     cursor: pointer;
-    color: var(--text-dark);
+    color: #000;
     line-height: 1;
     transition: var(--transition);
 }
