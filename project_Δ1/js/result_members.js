@@ -47,6 +47,8 @@ function displayRanking() {
 
     // スコアでソート
     results.sort((a, b) => calcScore(a) - calcScore(b));
+    sendMembersResultsToServer(results);
+
 
     // ランクを再付与
     results.forEach((r, i) => { r.rank = i + 1; });
@@ -125,4 +127,40 @@ function goToHome() {
     localStorage.removeItem('membersPlayers');
     localStorage.removeItem('membersCurrentTurn');
     window.location.href = 'index.html';
+}
+// ===================================================
+// ▼ DB保存（多人数結果をPHPへ送信）
+// ===================================================
+function sendMembersResultsToServer(results) {
+  // 試合ID（同じ試合を束ねる）
+  let sessionId = localStorage.getItem('multiSessionId');
+  if (!sessionId) {
+    sessionId = (crypto?.randomUUID?.() ?? String(Date.now()));
+    localStorage.setItem('multiSessionId', sessionId);
+  }
+
+  // 二重送信防止（リロード対策）
+  const sentKey = 'membersResultsSent:' + sessionId;
+  if (localStorage.getItem(sentKey) === '1') return;
+
+  const payload = {
+    sessionId,
+    playersCount: results.length,
+    results
+  };
+
+  fetch('api/save_members_results.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (res.ok) {
+      localStorage.setItem(sentKey, '1');
+    } else {
+      console.warn('保存失敗:', res.error);
+    }
+  })
+  .catch(err => console.error('通信エラー:', err));
 }
