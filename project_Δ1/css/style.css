@@ -215,6 +215,8 @@ body {
     font-weight: 700;
     color: var(--text-dark);
     text-align: center;
+    margin-top: 40px;
+    margin-bottom: 40px;
 }
 
 /* ========== 選択カード ========== */
@@ -229,8 +231,11 @@ body {
     box-shadow: var(--shadow);
     position: relative;
     max-width: 800px;
+    max-height: 600px;
     width: 100%;
+    margin-top:50px;
     animation: fadeInUp 0.6s ease-out;
+    /* height: 450px; 削除 */
 }
 
 @keyframes fadeInUp {
@@ -257,8 +262,13 @@ body {
     display: flex;
     gap: 30px;
     justify-content: center;
+    margin-top: 50px;
     margin-bottom: 50px;
     flex-wrap: wrap;
+    /* height: 100%; 削除 */
+    /* box-sizing: border-box; 削除 */
+    /* flex-direction: column; 削除 */
+    /* align-items: center; 削除 */
 }
 
 /* ========== ボタンスタイル ========== */
