@@ -5,15 +5,15 @@ $pdo = db();
 // 多人数(multi)のみ。クライアントのcalcScoreと同じ式で並べる
 $sql = "
   SELECT
-    player_name, player_color, turn_count, quiz_count, happening_count,
-    is_finished, finished_rank, session_id, created_at,
-    (CASE WHEN is_finished=1 THEN turn_count ELSE 9999 END)*100
-      - quiz_count*50
-      + happening_count*10 AS score
-  FROM results
-  WHERE mode='multi'
-  ORDER BY score ASC, created_at ASC
-  LIMIT 50
+  campaign_id,
+  player_name,
+  player_color,
+  SUM(turn_count) AS total_turns
+FROM results
+WHERE mode='multi'
+GROUP BY campaign_id, player_name, player_color
+HAVING COUNT(DISTINCT stage_no) = 4
+ORDER BY total_turns ASC;
 ";
 $rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 ?>

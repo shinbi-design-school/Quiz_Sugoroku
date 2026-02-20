@@ -155,7 +155,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const stored = localStorage.getItem('membersPlayers');
   if (!stored) {
     alert('プレイヤーデータが見つかりません。');
-    window.location.href = 'members_select.html';
+    window.location.href = 'result_members.html?stage=4';
     return;
   }
   membersPlayers = JSON.parse(stored);
