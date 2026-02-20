@@ -243,14 +243,13 @@
         </div>
         
         <!-- 準備中2 -->
-        <div class="stage-card stage-disabled">
-          <div class="stage-icon">🔒</div>
-          <h2 class="stage-name">ミステリーステージ</h2>
+        <div class="stage-card" id="stageWorld">
+          <div class="stage-icon">✈️</div>
+          <h2 class="stage-name">せかいの首都クイズ</h2>
           <p class="stage-description">
-            新しいステージを準備中！<br>
-            お楽しみに！
+            世界の首都を知るクイズ！<br>
+            旅を楽しもう！
           </p>
-          <span class="stage-badge">準備中</span>
         </div>
         
         <!-- 準備中3 -->
@@ -315,6 +314,19 @@
           location.href = 'sugoroku_ultraman_member.html';
         }
       });
+
+            // ワールドステージカードのクリック処理
+      document.getElementById('stageWorld').addEventListener('click', function() {
+        // localStorageから遊び方を取得
+        const playMode = localStorage.getItem('playMode') || 'solo';
+        
+        if (playMode === 'solo') {
+          location.href = 'world_origin.html';
+        } else {
+          location.href = 'world_members.html';
+        }
+      });
+
     </script>
     <script src="js/script.js"></script>
     <script src="js/background_move.js"></script>
