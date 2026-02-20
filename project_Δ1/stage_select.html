@@ -232,15 +232,14 @@
           </p>
         </div>
         
-        <!-- 準備中1 -->
-        <div class="stage-card stage-disabled">
-          <div class="stage-icon">🔒</div>
-          <h2 class="stage-name">ミステリーステージ</h2>
+        <!-- ウルトラマンクイズ -->
+        <div class="stage-card" id="stageUltraman">
+          <div class="stage-icon">(o|o)</div>
+          <h2 class="stage-name">ウルトラマンクイズ</h2>
           <p class="stage-description">
-            新しいステージを準備中！<br>
-            お楽しみに！
+            ウルトラマンに関する知識を深めながら<br>
+            世界を救おう！
           </p>
-          <span class="stage-badge">準備中</span>
         </div>
         
         <!-- 準備中2 -->
@@ -302,6 +301,18 @@
           location.href = 'quiz_mountain.html';
         } else {
           location.href = 'quiz_mountain_members.html';
+        }
+      });
+
+      // ウルトラマンクイズステージカードのクリック処理
+      document.getElementById('stageUltraman').addEventListener('click', function() {
+        // localStorageから遊び方を取得
+        const playMode = localStorage.getItem('playMode') || 'solo';
+        
+        if (playMode === 'solo') {
+          location.href = 'sugoroku_ultlaman.html';
+        } else {
+          location.href = 'sugoroku_ultraman_member.html';
         }
       });
     </script>
