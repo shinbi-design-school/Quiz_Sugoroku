@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>みんなの結果 - 焚火ヴィジランテ</title>
-    <link rel="icon" type="image/png" href="../images/pechi.png">
-    <link rel="stylesheet" href="../css/background_move.css" />
+    <link rel="icon" type="image/png" href="../images/pechi.png" />
+    <link rel="stylesheet" href="../css/op_background_move.css" />
     <link rel="stylesheet" href="../css/result.css" />
     <style>
       /* ========== ランキング全体 ========== */
@@ -22,13 +22,19 @@
         font-weight: bold;
         color: #fff;
         margin-bottom: 32px;
-        text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
         animation: fadeInDown 0.6s ease-out;
       }
 
       @keyframes fadeInDown {
-        from { opacity: 0; transform: translateY(-20px); }
-        to   { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       /* ========== 各ランキングカード ========== */
@@ -41,50 +47,87 @@
         border-radius: 20px;
         padding: 20px 28px;
         margin-bottom: 18px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         animation: fadeInUp 0.5s ease-out both;
         position: relative;
         overflow: hidden;
       }
       .rank-card::before {
-        content: '';
+        content: "";
         position: absolute;
-        left: 0; top: 0; bottom: 0;
+        left: 0;
+        top: 0;
+        bottom: 0;
         width: 6px;
         border-radius: 20px 0 0 20px;
       }
-      .rank-card.rank-1::before { background: #FFD700; }
-      .rank-card.rank-2::before { background: #C0C0C0; }
-      .rank-card.rank-3::before { background: #CD7F32; }
-      .rank-card.rank-other::before { background: #aaa; }
+      .rank-card.rank-1::before {
+        background: #ffd700;
+      }
+      .rank-card.rank-2::before {
+        background: #c0c0c0;
+      }
+      .rank-card.rank-3::before {
+        background: #cd7f32;
+      }
+      .rank-card.rank-other::before {
+        background: #aaa;
+      }
 
       @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(24px); }
-        to   { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       /* ========== 順位バッジ ========== */
       .rank-badge {
         flex-shrink: 0;
-        width: 56px; height: 56px;
+        width: 56px;
+        height: 56px;
         border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 1.6rem; font-weight: bold;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        font-weight: bold;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
       }
-      .rank-1 .rank-badge { background: #FFD700; color: #5a3e00; font-size: 1.8rem; }
-      .rank-2 .rank-badge { background: #C0C0C0; color: #333; }
-      .rank-3 .rank-badge { background: #CD7F32; color: #fff; }
-      .rank-other .rank-badge { background: #e0e0e0; color: #555; font-size: 1.3rem; }
+      .rank-1 .rank-badge {
+        background: #ffd700;
+        color: #5a3e00;
+        font-size: 1.8rem;
+      }
+      .rank-2 .rank-badge {
+        background: #c0c0c0;
+        color: #333;
+      }
+      .rank-3 .rank-badge {
+        background: #cd7f32;
+        color: #fff;
+      }
+      .rank-other .rank-badge {
+        background: #e0e0e0;
+        color: #555;
+        font-size: 1.3rem;
+      }
 
       /* ========== アバター ========== */
       .rank-avatar {
         flex-shrink: 0;
-        width: 64px; height: 64px;
+        width: 64px;
+        height: 64px;
         border-radius: 50%;
-        border: 3px solid rgba(0,0,0,0.1);
-        background: rgba(0,0,0,0.04);
-        display: flex; align-items: center; justify-content: center;
+        border: 3px solid rgba(0, 0, 0, 0.1);
+        background: rgba(0, 0, 0, 0.04);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         overflow: hidden;
       }
 
@@ -98,7 +141,9 @@
         font-weight: bold;
         color: #222;
         margin-bottom: 6px;
-        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .rank-stats {
         display: flex;
@@ -108,24 +153,46 @@
         color: #555;
       }
       .stat-item {
-        display: flex; align-items: center; gap: 4px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
       }
-      .stat-icon { font-size: 1rem; }
+      .stat-icon {
+        font-size: 1rem;
+      }
 
       /* ========== スコア・評価 ========== */
       .rank-score {
         flex-shrink: 0;
-        display: flex; flex-direction: column; align-items: center; gap: 4px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
       }
       .score-grade {
-        font-size: 2rem; font-weight: bold; line-height: 1;
+        font-size: 2rem;
+        font-weight: bold;
+        line-height: 1;
       }
-      .score-grade.grade-S { color: #e6a800; }
-      .score-grade.grade-A { color: #00b050; }
-      .score-grade.grade-B { color: #0070c0; }
-      .score-grade.grade-C { color: #7030a0; }
-      .score-grade.grade-D { color: #888; }
-      .score-label { font-size: 0.75rem; color: #888; }
+      .score-grade.grade-S {
+        color: #e6a800;
+      }
+      .score-grade.grade-A {
+        color: #00b050;
+      }
+      .score-grade.grade-B {
+        color: #0070c0;
+      }
+      .score-grade.grade-C {
+        color: #7030a0;
+      }
+      .score-grade.grade-D {
+        color: #888;
+      }
+      .score-label {
+        font-size: 0.75rem;
+        color: #888;
+      }
 
       /* ========== 1位特別演出 ========== */
       .rank-1 {
@@ -134,13 +201,18 @@
       }
       .crown {
         position: absolute;
-        top: -10px; right: 16px;
+        top: -10px;
+        right: 16px;
         font-size: 2rem;
         animation: crownBounce 1s ease infinite alternate;
       }
       @keyframes crownBounce {
-        from { transform: translateY(0) rotate(-5deg); }
-        to   { transform: translateY(-6px) rotate(5deg); }
+        from {
+          transform: translateY(0) rotate(-5deg);
+        }
+        to {
+          transform: translateY(-6px) rotate(5deg);
+        }
       }
 
       /* ========== ボタンエリア ========== */
@@ -171,13 +243,17 @@
 
         <!-- ボタンエリア -->
         <div class="button-area">
-          <button class="btn btn-primary" onclick="playAgain()">もう一度遊ぶ</button>
-          <button class="btn btn-secondary" onclick="goToHome()">ホームに戻る</button>
+          <button class="btn btn-primary" onclick="playAgain()">
+            もう一度遊ぶ
+          </button>
+          <button class="btn btn-secondary" onclick="goToHome()">
+            ホームに戻る
+          </button>
         </div>
       </div>
     </main>
 
     <script src="../js/result_members.js"></script>
-    <script src="../js/background_move.js"></script>
+    <script src="../js/op_background_move.js"></script>
   </body>
 </html>
