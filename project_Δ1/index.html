@@ -4,21 +4,29 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>双六ゲーム - プレイ人数選択</title>
-    <link rel="icon" type="image/png" href="images/pechi.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Honk:MORF,SHLN@14,35.7&family=Kiwi+Maru&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="images/pechi.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Honk:MORF,SHLN@14,35.7&family=Kiwi+Maru&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="css/reset.css" />
-    <link rel="stylesheet" href="css/background_move.css" />
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/op_background_move.css" />
+    <link rel="stylesheet" href="css/op_style.css" />
     <style>
       .choice-button:hover {
         animation: buttonPulse 0.8s ease-in-out infinite;
       }
-      
+
       @keyframes buttonPulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.05); }
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
       }
     </style>
   </head>
@@ -86,21 +94,25 @@
           <button
             class="choice-button"
             onclick="location.href = 'site_howtouse.html'"
-            style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"
+            style="
+              background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            "
           >
             遊び方
           </button>
           <button
             class="choice-button"
             onclick="location.href = 'op.html'"
-            style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);"
+            style="
+              background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            "
           >
             ホームへ戻る
           </button>
         </div>
       </div>
     </main>
-    <script src="js/script.js"></script>
-    <script src="js/background_move.js"></script>
+    <script src="js/op_script.js"></script>
+    <script src="js/op_background_move.js"></script>
   </body>
 </html>

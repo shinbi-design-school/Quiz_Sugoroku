@@ -1,0 +1,15 @@
+/* html, body {
+  margin: 0;
+  padding: 0;
+  background: #02040a;
+  overflow: hidden;
+  font-family: monospace;
+} */
+
+canvas {
+  position: fixed;
+  inset: 0;
+  display: block;
+  z-index: -1;
+  pointer-events: none;
+}
