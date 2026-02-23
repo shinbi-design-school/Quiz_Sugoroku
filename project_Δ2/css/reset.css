@@ -1,0 +1,112 @@
+/* ========================================
+   リセットCSS + フォント強制適用
+======================================== */
+
+/* 基本リセット */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+
+/* HTML5 display-role reset */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+body {
+  line-height: 1;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* ========================================
+   Honkフォント適用 + 標準サイズ・色
+======================================== */
+
+/* すべてのh1タグに適用 */
+body h1,
+main h1,
+header h1,
+.header h1,
+.title-area h1,
+.game-title {
+  font-family: "Honk", system-ui !important;
+  font-optical-sizing: auto !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  font-variation-settings: "MORF" 14, "SHLN" 35.7 !important;
+  font-size: 2rem !important;
+  color: #fcff4c !important;
+}
+
+/* h2タグ（stage-nameなど） */
+h2,
+h2.stage-name,
+.stage-card .stage-name {
+  font-family: "Honk", system-ui !important;
+  font-optical-sizing: auto !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  font-variation-settings: "MORF" 14, "SHLN" 35.7 !important;
+  font-size: 1.5rem !important;
+  color: #fcff4c !important;
+}
+
+/* members_select.html用のタイトル */
+.count-title,
+.players-title {
+  font-family: "Honk", system-ui !important;
+  font-optical-sizing: auto !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  font-variation-settings: "MORF" 14, "SHLN" 35.7 !important;
+  font-size: 2rem !important;
+  color: #fcff4c !important;
+}
+
+/* pタグ */
+p, .kiwi-maru-regular {
+  font-family: "Kiwi Maru", serif !important;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1rem !important;
+}

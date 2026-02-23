@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>作成者紹介 - 焚火のヴィジランテ</title>
+    <link rel="icon" type="image/png" href="../images/pechi.png" />
+    <link rel="stylesheet" href="../css/op_background_move.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/team.css" />
+  </head>
+  <body>
+    <canvas id="fiber"></canvas>
+    <header class="header">
+      <div class="header-content">
+        <div class="header-left">
+          <span class="header-title">
+            <a href="../index.html">
+              <img class="header-img" src="../images/takibi_logo.png" alt="ロゴ" />
+            </a>
+          </span>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="メニュー">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
+    </header>
+
+    <nav class="menu-overlay" id="menuOverlay">
+      <div class="menu-content">
+        <button class="menu-close" id="menuClose" aria-label="閉じる">
+          &times;
+        </button>
+        <ul class="menu-list">
+          <li><a href="../index.html" class="menu-item">ホーム</a></li>
+          <li><a href="site_howtouse.html" class="menu-item">遊び方</a></li>
+          <li><a href="team.html" class="menu-item">作成者</a></li>
+          <li><a href="documents.html" class="menu-item">資料</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="main-container">
+      <div class="title-area">
+        <h1 class="game-title">🎮作成者紹介🎮</h1>
+      </div>
+
+      <div class="creator-grid">
+        <div class="creator-card">
+          <div class="creator-icon">
+            <img src="../images/daichaso 1.png" alt="だいちゃそのアイコン" />
+          </div>
+          <h2 class="creator-name">だいちゃそ</h2>
+          <p class="creator-role">リーダー / パワー・ポッター</p>
+          <p class="creator-comment">
+            担当は要件定義(？)→フロントエンド中心→デバッグを少々。</br>
+            今回はClaude先生と、Copilot教授に頼りまくりました。</br>
+            え？自分は何をしたかって？
+            ・・・パワー・ポッターだよ。
+          </br><a href="#">link</a><br />
+          </p>
+        </div>
+
+        <div class="creator-card">
+          <div class="creator-icon">
+            <img src="../images/niwata.png" alt="にわたのアイコン" />
+          </div>
+          <h2 class="creator-name">ニワタ</h2>
+          <p class="creator-role">サブリーダー/ デザイナー / バックエンド</p>
+          <p class="creator-comment">
+            微調整してました。あと口出し... みんなありがとう。
+          </p>
+        </div>
+
+        <div class="creator-card">
+          <div class="creator-icon">
+            <img src="../images/pechi.png" alt="makizoのアイコン" />
+          </div>
+          <h2 class="creator-name">makizo</h2>
+          <p class="creator-role">デザイナー</p>
+          <p class="creator-comment">
+            画像に携わりました。 (人''▽｀)ありがとうございました！
+          </p>
+        </div>
+
+        <div class="creator-card">
+          <div class="creator-icon">
+            <img src="../images/yokoyama.png" alt="よこやまのアイコン" />
+          </div>
+          <h2 class="creator-name">よこP</h2>
+          <p class="creator-role">プログラマー / フロントエンド</p>
+          <p class="creator-comment">
+            Pですがプロデューサーではないです。 メニュー画面などを担当しました。
+          </p>
+        </div>
+      </div>
+
+      <div class="button-container">
+        <button class="choice-button" onclick="location.href = '../index.html'">
+          ホームへ戻る
+        </button>
+      </div>
+    </main>
+
+    <script src="../js/script.js"></script>
+    <script src="../js/op_background_move.js"></script>
+  </body>
+</html>
