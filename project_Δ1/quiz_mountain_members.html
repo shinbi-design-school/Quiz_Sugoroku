@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>みんなで山の雑学クイズ</title>
+    <title>山の雑学クイズ- 山の知識を深めて頂上を目指そう！</title>
     <link rel="icon" type="image/png" href="images/pechi.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,9 +12,10 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/reset.css" />
-    <link rel="stylesheet" href="css/background_move.css" />
+    <link rel="stylesheet" href="css/mountain_bg.css" />
+    <!-- <link rel="stylesheet" href="css/background_move.css" /> -->
     <link rel="stylesheet" href="css/quiz_mountain_multi_style.css" />
-    <link rel="stylesheet" href="css/style.css" />
+    <!-- <link rel="stylesheet" href="css/style.css" /> -->
     <style>
       /* 順番決めポップアップ */
       .order-popup {
@@ -47,7 +48,7 @@
       .order-popup-title {
         font-size: 2rem;
         font-weight: bold;
-        color: #fcff4c;
+        color: #000;
         margin-bottom: 16px;
         text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
       }
@@ -109,7 +110,7 @@
     </style>
   </head>
   <body>
-    <canvas id="fiber"></canvas>
+    <canvas id="mountain-bg" aria-label="山と雲がスクロールする背景"></canvas>
 
     <!-- 順番決め開始ポップアップ -->
     <div id="orderStartPopup" class="order-popup">
@@ -350,10 +351,7 @@
     </div>
 
     <!-- ホームに戻るボタン -->
-    <div
-      class="button-container"
-      style="text-align: center; margin: 40px 0; padding-bottom: 100px"
-    >
+    <div class="button-container">
       <button
         class="choice-button"
         onclick="location.href = 'stage_select.html'"
@@ -364,6 +362,6 @@
 
     <footer></footer>
     <script src="js/quiz_mountain_members_script.js"></script>
-    <script src="js/background_move.js"></script>
+    <script src="js/mountain_bg.js"></script>
   </body>
 </html>
