@@ -619,7 +619,7 @@ header p {
 .modal.active { display: flex; }
 
 .modal-content {
-    background:  #8297f3;
+    background:  #56e762;
     padding: 30px;
     border-radius: 20px;
     width: 90%;
