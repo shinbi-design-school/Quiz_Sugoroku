@@ -332,6 +332,9 @@ header p {
     font-weight: bold;
     margin-top: 5px;
     color: #000000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .square-number {

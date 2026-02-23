@@ -191,28 +191,8 @@ window.addEventListener('DOMContentLoaded', () => {
 // ===================================================
 function buildPathAndLayout() {
   pathTiles = [];
-  const allTiles = [];
-
-  allTiles.push({ type: 'start', name: '', icon: '' });
-
-  const masterNames = masterData.filter(t => t.type !== 'start' && t.type !== 'goal');
-  let qId = 1, hCount = 0, mIdx = 0;
-
-  for (let i = 1; i <= 47; i++) {
-    const cur = masterNames[mIdx % masterNames.length];
-    if (i % 6 === 0 && hCount < 7) {
-      allTiles.push({ type: 'happening', name: cur.name, icon: '💥', effect: -2 });
-      hCount++;
-    } else if (qId <= 40) {
-      allTiles.push({ type: 'quiz', name: cur.name, icon: '', quizId: qId });
-      qId++;
-    } else {
-      allTiles.push({ type: 'normal', name: cur.name, icon: '' });
-    }
-    mIdx++;
-  }
-
-  allTiles.push({ type: 'goal', name: '', icon: '' });
+  // masterDataをそのままallTilesにコピー
+  const allTiles = masterData.map(tile => ({ ...tile }));
 
   // 配置計算（7×7蛇行 grid14×14）
   const ROWS_C = 7, COLS_C = 7;
