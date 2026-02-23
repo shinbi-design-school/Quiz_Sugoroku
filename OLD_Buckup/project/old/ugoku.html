@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Cyber Code + Laser Animation</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #02040a;
+    overflow: hidden;
+    font-family: monospace;
+  }
+  canvas {
+    position: fixed;
+    inset: 0;
+    display: block;
+    z-index: -1;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="fiber"></canvas>
+
+<script>
+const canvas = document.getElementById("fiber");
+const ctx = canvas.getContext("2d");
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+// ノード（光ファイバー）
+const NODES = 45;
+const MAX_DIST = 230;
+const nodes = Array.from({ length: NODES }, () => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * canvas.height,
+  vx: (Math.random() - 0.5) * 0.4,
+  vy: (Math.random() - 0.5) * 0.4,
+  phase: Math.random() * Math.PI * 2
+}));
+
+// 浮遊する JavaScript コード片
+const codeSnippets = [
+  "const x = 10;",
+  "let count = 0;",
+  "function hello(){",
+  "  console.log('Hello');",
+  "}",
+  "for(let i=0;i<5;i++){}",
+  "if(a > b) return;",
+  "const sum = (a,b)=>a+b;"
+];
+
+const floatingCodes = Array.from({ length: 12 }, () => ({
+  text: codeSnippets[Math.floor(Math.random() * codeSnippets.length)],
+  x: Math.random() * canvas.width,
+  y: Math.random() * canvas.height,
+  speed: 0.3 + Math.random() * 0.5,
+  alpha: 0.3 + Math.random() * 0.7
+}));
+
+// レーザー光線
+const lasers = [];
+function spawnLaser() {
+  lasers.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    angle: Math.random() * Math.PI * 2,
+    life: 0
+  });
+}
+setInterval(spawnLaser, 400);
+
+function draw() {
+  ctx.fillStyle = "rgba(2, 4, 12, 0.3)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // ノード更新
+  nodes.forEach(n => {
+    n.x += n.vx;
+    n.y += n.vy;
+    n.phase += 0.02;
+
+    if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
+    if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+  });
+
+  // 光る線（光ファイバー）
+  for (let i = 0; i < NODES; i++) {
+    for (let j = i + 1; j < NODES; j++) {
+      const a = nodes[i];
+      const b = nodes[j];
+      const dx = a.x - b.x;
+      const dy = a.y - b.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < MAX_DIST) {
+        const alpha = 1 - dist / MAX_DIST;
+        const glow = 0.4 + 0.6 * Math.sin((a.phase + b.phase) / 2);
+        const finalAlpha = alpha * glow * 0.7;
+
+        const grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+        grad.addColorStop(0, `rgba(0,255,255,${finalAlpha})`);
+        grad.addColorStop(1, `rgba(0,120,255,${finalAlpha * 0.7})`);
+
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
+    }
+  }
+
+  // 光るノード
+  nodes.forEach(n => {
+    const r = 2.5 + 1.2 * Math.sin(n.phase);
+
+    const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r * 4);
+    g.addColorStop(0, "rgba(0,255,255,0.9)");
+    g.addColorStop(0.4, "rgba(0,180,255,0.6)");
+    g.addColorStop(1, "rgba(0,40,80,0)");
+
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, r * 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "#ccfaff";
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // 浮遊する JavaScript コード片
+  floatingCodes.forEach(c => {
+    ctx.globalAlpha = c.alpha;
+    ctx.fillStyle = "#00eaff";
+    ctx.font = "16px monospace";
+    ctx.fillText(c.text, c.x, c.y);
+
+    c.y -= c.speed;
+    if (c.y < -20) {
+      c.y = canvas.height + 20;
+      c.x = Math.random() * canvas.width;
+    }
+  });
+  ctx.globalAlpha = 1;
+
+  // レーザー光線
+  lasers.forEach(l => {
+    l.life += 0.05;
+    const length = 200 + Math.sin(l.life) * 80;
+
+    const x2 = l.x + Math.cos(l.angle) * length;
+    const y2 = l.y + Math.sin(l.angle) * length;
+
+    const alpha = Math.max(0, 1 - l.life / 3);
+
+    ctx.strokeStyle = `rgba(0,255,180,${alpha})`;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(l.x, l.y);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  });
+
+  // 古いレーザーを削除
+  for (let i = lasers.length - 1; i >= 0; i--) {
+    if (lasers[i].life > 3) lasers.splice(i, 1);
+  }
+
+  requestAnimationFrame(draw);
+}
+
+draw();
+</script>
+
+</body>
+</html>

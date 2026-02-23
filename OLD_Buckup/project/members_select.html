@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>みんなであそぶ - プレイヤー設定</title>
+    <link rel="icon" type="image/png" href="images/pechi.png">
+    <link rel="stylesheet" href="css/background_move.css">
+    <link rel="stylesheet" href="css/character-selection.css">
+    <style>
+        /* ========== 人数選択ステップ ========== */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        .step-dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transition: all 0.3s;
+        }
+        .step-dot.active { background: #fcff4c; transform: scale(1.3); }
+        .step-dot.done   { background: #00B050; }
+
+        /* ========== 人数選択 ========== */
+        #stepCount { animation: fadeInUp 0.5s ease-out; }
+        .count-title {
+            font-size: 2rem; font-weight: bold;
+            text-align: center; color: var(--text-dark);
+            margin-bottom: 30px;
+        }
+        .count-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .count-btn {
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            border: 4px solid #fcff4c;
+            background: rgba(255,255,255,0.1);
+            color: #fcff4c;
+            font-size: 2.2rem; font-weight: bold;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .count-btn:hover, .count-btn.selected {
+            background: #fcff4c;
+            color: #22173b;
+            transform: scale(1.12);
+            box-shadow: 0 6px 20px rgba(252,255,76,0.4);
+        }
+
+        /* ========== プレイヤー設定ステップ ========== */
+        #stepPlayers { animation: fadeInUp 0.5s ease-out; }
+        .players-title {
+            font-size: 1.6rem; font-weight: bold;
+            text-align: center; color: var(--text-dark);
+            margin-bottom: 24px;
+        }
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .player-card {
+            background: rgba(255,255,255,0.12);
+            border: 2px solid rgba(252,255,76,0.4);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            transition: border-color 0.3s;
+        }
+        .player-card:focus-within { border-color: #fcff4c; }
+        .player-number-badge {
+            font-size: 0.85rem; font-weight: bold;
+            background: #fcff4c; color: #22173b;
+            padding: 3px 14px; border-radius: 20px;
+            align-self: flex-start;
+        }
+        .player-card .player-avatar-wrap {
+            width: 80px; height: 80px;
+        }
+        .player-card svg { width: 80px; height: 80px; }
+        .player-card .player-name-input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 2px solid rgba(252,255,76,0.5);
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            font-size: 1rem; font-weight: bold;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .player-card .player-name-input::placeholder { color: rgba(255,255,255,0.5); }
+        .player-card .player-name-input:focus { border-color: #fcff4c; }
+
+        .color-row {
+            display: flex; align-items: center; gap: 10px;
+            width: 100%;
+        }
+        .color-row label { font-size: 0.9rem; color: rgba(255,255,255,0.8); white-space: nowrap; }
+        .color-presets-row {
+            display: flex; gap: 7px; flex-wrap: wrap; justify-content: center;
+        }
+        .preset-dot {
+            width: 26px; height: 26px; border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .preset-dot:hover, .preset-dot.active {
+            border-color: #fff;
+            transform: scale(1.25);
+        }
+
+        /* ========== ボタン群 ========== */
+        .action-row {
+            display: flex; justify-content: center; gap: 16px;
+            margin-top: 10px; flex-wrap: wrap;
+        }
+        .btn-back {
+            padding: 14px 36px; font-size: 1rem; font-weight: bold;
+            border-radius: 50px; border: 2px solid #fcff4c;
+            background: transparent; color: #fcff4c;
+            cursor: pointer; transition: all 0.25s;
+        }
+        .btn-back:hover { background: rgba(252,255,76,0.15); }
+        .btn-start {
+            padding: 14px 48px; font-size: 1.1rem; font-weight: bold;
+            border-radius: 50px; border: none;
+            background: #fcff4c; color: #22173b;
+            cursor: pointer; transition: all 0.25s;
+            box-shadow: 0 4px 15px rgba(252,255,76,0.4);
+        }
+        .btn-start:hover  { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(252,255,76,0.5); }
+        .btn-start:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="fiber"></canvas>
+
+    <!-- ヘッダー -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <span class="header-title">
+                    <a href="index.html">
+                        <img class="header-img" src="images/takibi_logo.png" alt="">
+                    </a>
+                </span>
+            </div>
+            <button class="hamburger" id="hamburger" aria-label="メニュー">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ハンバーガーメニュー -->
+    <nav class="menu-overlay" id="menuOverlay">
+        <div class="menu-content">
+            <button class="menu-close" id="menuClose" aria-label="閉じる">&times;</button>
+            <ul class="menu-list">
+                <li><a href="index.html" class="menu-item">ホーム</a></li>
+                <li><a href="site_howtouse.html" class="menu-item">遊び方</a></li>
+                <li><a href="team.html" class="menu-item">作成者</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <main class="main-container">
+        <div class="character-card" style="max-width:860px; width:95%;">
+
+            <!-- ステップインジケーター -->
+            <div class="step-indicator">
+                <div class="step-dot active" id="dot1"></div>
+                <div class="step-dot" id="dot2"></div>
+            </div>
+
+            <!-- STEP 1: 人数選択 -->
+            <div id="stepCount">
+                <p class="count-title">👥 何人で遊ぶ？</p>
+                <div class="count-buttons">
+                    <button class="count-btn" data-count="2">2</button>
+                    <button class="count-btn" data-count="3">3</button>
+                    <button class="count-btn" data-count="4">4</button>
+                </div>
+                <div class="action-row" style="margin-top:30px;">
+                    <button class="btn-back" onclick="location.href='index.html'">← もどる</button>
+                    <button class="btn-start" id="btnToPlayers" disabled>次へ →</button>
+                </div>
+            </div>
+
+            <!-- STEP 2: プレイヤー設定（JSで動的生成） -->
+            <div id="stepPlayers" style="display:none;">
+                <p class="players-title">🎮 プレイヤーを設定しよう</p>
+                <div class="players-grid" id="playersGrid"></div>
+                <div class="action-row">
+                    <button class="btn-back" id="btnBackToCount">← 人数変更</button>
+                    <button class="btn-start" id="btnStartGame" disabled>ゲームスタート！</button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="js/background_move.js"></script>
+    <script>
+    // ========== ハンバーガーメニュー ==========
+    const hamburger = document.getElementById('hamburger');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const menuClose = document.getElementById('menuClose');
+    hamburger.addEventListener('click', () => menuOverlay.classList.toggle('active'));
+    menuClose.addEventListener('click', () => menuOverlay.classList.remove('active'));
+    menuOverlay.addEventListener('click', e => { if (e.target === menuOverlay) menuOverlay.classList.remove('active'); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') menuOverlay.classList.remove('active'); });
+
+    // ========== 設定値 ==========
+    const COLOR_PRESETS = [
+        { name: '水色',  hex: '#00BFFF' },
+        { name: '赤',    hex: '#FF6B6B' },
+        { name: '緑',    hex: '#00B050' },
+        { name: '黄',    hex: '#FFC000' },
+        { name: '紫',    hex: '#764ba2' },
+        { name: 'ピンク',hex: '#FF69B4' },
+        { name: 'オレンジ', hex: '#FF8C00' },
+        { name: '白',    hex: '#F0F0F0' },
+    ];
+    // 初期色をプレイヤーごとに割り当て
+    const DEFAULT_COLORS = ['#00BFFF', '#FF6B6B', '#00B050', '#FFC000'];
+    const AVATAR_PATH = 'M 60 140 L 40 120 L 35 120 L 45 80 A 40 40 0 1 1 75 80 L 85 120 L 80 120 Z';
+
+    let selectedCount = 0;
+
+    // ========== STEP 1: 人数選択 ==========
+    const countBtns = document.querySelectorAll('.count-btn');
+    const btnToPlayers = document.getElementById('btnToPlayers');
+
+    countBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            countBtns.forEach(b => b.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedCount = parseInt(this.dataset.count);
+            btnToPlayers.disabled = false;
+        });
+    });
+
+    btnToPlayers.addEventListener('click', () => {
+        buildPlayerForms(selectedCount);
+        document.getElementById('stepCount').style.display = 'none';
+        document.getElementById('stepPlayers').style.display = '';
+        document.getElementById('dot1').classList.remove('active');
+        document.getElementById('dot1').classList.add('done');
+        document.getElementById('dot2').classList.add('active');
+    });
+
+    document.getElementById('btnBackToCount').addEventListener('click', () => {
+        document.getElementById('stepPlayers').style.display = 'none';
+        document.getElementById('stepCount').style.display = '';
+        document.getElementById('dot2').classList.remove('active');
+        document.getElementById('dot1').classList.remove('done');
+        document.getElementById('dot1').classList.add('active');
+    });
+
+    // ========== STEP 2: プレイヤーカード生成 ==========
+    function buildPlayerForms(count) {
+        const grid = document.getElementById('playersGrid');
+        grid.innerHTML = '';
+
+        for (let i = 0; i < count; i++) {
+            const color = DEFAULT_COLORS[i];
+            const card = document.createElement('div');
+            card.className = 'player-card';
+            card.innerHTML = `
+                <span class="player-number-badge">プレイヤー ${i + 1}</span>
+                <div class="player-avatar-wrap">
+                    <svg id="avatar${i}" width="80" height="80" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+                        <path id="avatarBody${i}" d="${AVATAR_PATH}" fill="${color}"/>
+                        <circle cx="50" cy="45" r="12" fill="white" opacity="0.3"/>
+                    </svg>
+                </div>
+                <input type="text" class="player-name-input" id="name${i}"
+                    placeholder="プレイヤー${i + 1}の名前" maxlength="12"/>
+                <div class="color-row">
+                    <label>🎨 色：</label>
+                    <div class="color-presets-row" id="presets${i}"></div>
+                </div>
+            `;
+            grid.appendChild(card);
+
+            // カラープリセット生成
+            const presetsDiv = card.querySelector(`#presets${i}`);
+            COLOR_PRESETS.forEach(p => {
+                const dot = document.createElement('div');
+                dot.className = 'preset-dot' + (p.hex === color ? ' active' : '');
+                dot.style.background = p.hex;
+                dot.title = p.name;
+                dot.dataset.hex = p.hex;
+                dot.addEventListener('click', () => {
+                    presetsDiv.querySelectorAll('.preset-dot').forEach(d => d.classList.remove('active'));
+                    dot.classList.add('active');
+                    document.getElementById(`avatarBody${i}`).setAttribute('fill', p.hex);
+                });
+                presetsDiv.appendChild(dot);
+            });
+
+            // 名前入力でスタートボタン有効化チェック
+            card.querySelector(`#name${i}`).addEventListener('input', checkAllNames);
+        }
+        checkAllNames();
+    }
+
+    function checkAllNames() {
+        const inputs = document.querySelectorAll('#playersGrid .player-name-input');
+        const allFilled = Array.from(inputs).every(inp => inp.value.trim().length > 0);
+        document.getElementById('btnStartGame').disabled = !allFilled;
+    }
+
+    // ========== ゲームスタート ==========
+    document.getElementById('btnStartGame').addEventListener('click', () => {
+        const inputs = document.querySelectorAll('#playersGrid .player-name-input');
+        const players = Array.from(inputs).map((inp, i) => {
+            const activePreset = document.querySelector(`#presets${i} .preset-dot.active`);
+            const color = activePreset ? activePreset.dataset.hex : DEFAULT_COLORS[i];
+            return {
+                name: inp.value.trim(),
+                color: color,
+                avatarPath: AVATAR_PATH
+            };
+        });
+
+        // localStorage に保存して遷移
+        localStorage.setItem('membersPlayers', JSON.stringify(players));
+        localStorage.setItem('membersCurrentTurn', '0');   // 現在のプレイヤーindex
+        localStorage.setItem('membersResults', JSON.stringify([])); // 結果格納先
+
+        window.location.href = 'sugoroku_members_play.html';
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>みんなの結果 - 焚火ヴィジランテ</title>
+    <link rel="icon" type="image/png" href="images/pechi.png">
+    <link rel="stylesheet" href="css/background_move.css" />
+    <link rel="stylesheet" href="css/result.css" />
+    <style>
+      /* ========== ランキング全体 ========== */
+      .ranking-container {
+        max-width: 720px;
+        width: 95%;
+        margin: 0 auto;
+        padding: 30px 0 80px;
+      }
+
+      .ranking-title {
+        text-align: center;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #fff;
+        margin-bottom: 32px;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        animation: fadeInDown 0.6s ease-out;
+      }
+
+      @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      /* ========== 各ランキングカード ========== */
+      .rank-card {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        background: rgba(255, 255, 255, 0.82);
+        backdrop-filter: blur(8px);
+        border-radius: 20px;
+        padding: 20px 28px;
+        margin-bottom: 18px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        animation: fadeInUp 0.5s ease-out both;
+        position: relative;
+        overflow: hidden;
+      }
+      .rank-card::before {
+        content: '';
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 6px;
+        border-radius: 20px 0 0 20px;
+      }
+      .rank-card.rank-1::before { background: #FFD700; }
+      .rank-card.rank-2::before { background: #C0C0C0; }
+      .rank-card.rank-3::before { background: #CD7F32; }
+      .rank-card.rank-other::before { background: #aaa; }
+
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(24px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      /* ========== 順位バッジ ========== */
+      .rank-badge {
+        flex-shrink: 0;
+        width: 56px; height: 56px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.6rem; font-weight: bold;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      }
+      .rank-1 .rank-badge { background: #FFD700; color: #5a3e00; font-size: 1.8rem; }
+      .rank-2 .rank-badge { background: #C0C0C0; color: #333; }
+      .rank-3 .rank-badge { background: #CD7F32; color: #fff; }
+      .rank-other .rank-badge { background: #e0e0e0; color: #555; font-size: 1.3rem; }
+
+      /* ========== アバター ========== */
+      .rank-avatar {
+        flex-shrink: 0;
+        width: 64px; height: 64px;
+        border-radius: 50%;
+        border: 3px solid rgba(0,0,0,0.1);
+        background: rgba(0,0,0,0.04);
+        display: flex; align-items: center; justify-content: center;
+        overflow: hidden;
+      }
+
+      /* ========== プレイヤー情報 ========== */
+      .rank-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .rank-name {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #222;
+        margin-bottom: 6px;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      .rank-stats {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        font-size: 0.88rem;
+        color: #555;
+      }
+      .stat-item {
+        display: flex; align-items: center; gap: 4px;
+      }
+      .stat-icon { font-size: 1rem; }
+
+      /* ========== スコア・評価 ========== */
+      .rank-score {
+        flex-shrink: 0;
+        display: flex; flex-direction: column; align-items: center; gap: 4px;
+      }
+      .score-grade {
+        font-size: 2rem; font-weight: bold; line-height: 1;
+      }
+      .score-grade.grade-S { color: #e6a800; }
+      .score-grade.grade-A { color: #00b050; }
+      .score-grade.grade-B { color: #0070c0; }
+      .score-grade.grade-C { color: #7030a0; }
+      .score-grade.grade-D { color: #888; }
+      .score-label { font-size: 0.75rem; color: #888; }
+
+      /* ========== 1位特別演出 ========== */
+      .rank-1 {
+        transform: scale(1.03);
+        box-shadow: 0 10px 30px rgba(255, 215, 0, 0.35);
+      }
+      .crown {
+        position: absolute;
+        top: -10px; right: 16px;
+        font-size: 2rem;
+        animation: crownBounce 1s ease infinite alternate;
+      }
+      @keyframes crownBounce {
+        from { transform: translateY(0) rotate(-5deg); }
+        to   { transform: translateY(-6px) rotate(5deg); }
+      }
+
+      /* ========== ボタンエリア ========== */
+      .button-area {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="fiber"></canvas>
+
+    <!-- ヘッダー -->
+    <header class="header">
+      <div class="header-content">
+        <h1>🏆 みんなの結果 🏆</h1>
+      </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="main-container">
+      <div class="ranking-container">
+        <p class="ranking-title" id="rankingTitle">🎉 結果発表！ 🎉</p>
+        <div id="rankingList"></div>
+
+        <!-- ボタンエリア -->
+        <div class="button-area">
+          <button class="btn btn-primary" onclick="playAgain()">もう一度遊ぶ</button>
+          <button class="btn btn-secondary" onclick="goToHome()">ホームに戻る</button>
+        </div>
+      </div>
+    </main>
+
+    <script src="js/result_members.js"></script>
+    <script src="js/background_move.js"></script>
+  </body>
+</html>
