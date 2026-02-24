@@ -389,18 +389,19 @@
           card.innerHTML = `
                 <span class="player-number-badge">プレイヤー ${i + 1}</span>
                 <div class="player-avatar-wrap">
-                    <svg id="avatar${i}" width="80" height="80" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
-                        <path id="avatarBody${i}" d="${AVATAR_PATH}" fill="${color}"/>
-                        <circle cx="50" cy="45" r="12" fill="white" opacity="0.3"/>
-                    </svg>
+                  <svg id="avatar${i}" width="80" height="80" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+                    <path id="avatarBody${i}" d="${AVATAR_PATH}" fill="${color}"/>
+                    <circle cx="50" cy="45" r="12" fill="white" opacity="0.3"/>
+                  </svg>
                 </div>
                 <input type="text" class="player-name-input" id="name${i}"
-                    placeholder="プレイヤー${i + 1}の名前" maxlength="12"/>
-                <div class="color-row">
-                    <label>🎨 色：</label>
-                    <div class="color-presets-row" id="presets${i}"></div>
+                  placeholder="プレイヤー${i + 1}の名前" maxlength="12"/>
+                <div class="color-row" style="gap:16px;align-items:center;">
+                  <label style="margin-bottom:0;">🎨 色：</label>
+                  <input type="color" id="colorPicker${i}" class="color-picker-input" value="${color}" style="width:32px;height:32px;border:none;background:none;cursor:pointer;" />
+                  <div class="color-presets-row" id="presets${i}" style="margin-left:8px;display:grid;grid-template-columns:repeat(4,28px);grid-template-rows:repeat(2,28px);gap:7px;justify-content:center;align-items:center;width:auto;"></div>
                 </div>
-            `;
+              `;
           grid.appendChild(card);
 
           // カラープリセット生成
@@ -419,6 +420,9 @@
               document
                 .getElementById(`avatarBody${i}`)
                 .setAttribute("fill", p.hex);
+              // カラーピッカーも同期
+              const picker = document.getElementById(`colorPicker${i}`);
+              if (picker) picker.value = p.hex;
             });
             presetsDiv.appendChild(dot);
           });
@@ -427,6 +431,24 @@
           card
             .querySelector(`#name${i}`)
             .addEventListener("input", checkAllNames);
+
+          // カラーピッカー制御
+          const colorPicker = card.querySelector(`#colorPicker${i}`);
+          colorPicker.addEventListener("input", (event) => {
+            const selectedColor = event.target.value;
+            // SVGアバター色を変更
+            document
+              .getElementById(`avatarBody${i}`)
+              .setAttribute("fill", selectedColor);
+            // プリセットのactiveも同期
+            presetsDiv.querySelectorAll(".preset-dot").forEach((d) => {
+              if (d.dataset.hex.toLowerCase() === selectedColor.toLowerCase()) {
+                d.classList.add("active");
+              } else {
+                d.classList.remove("active");
+              }
+            });
+          });
         }
         checkAllNames();
       }
