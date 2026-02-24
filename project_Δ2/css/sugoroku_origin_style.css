@@ -120,19 +120,18 @@ header p {
 /* ==========================================
    4. すごろく盤面（ボード）
    ========================================== */
-/* .board-wrapper {
-    width: 100vw;
-    margin-left: calc(-50vw + 50%);
-    margin-right: calc(-50vw + 50%);
-    overflow-x: hidden;
+.board-wrapper {
+    width: 100%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
-    background: #f8f9fa;
+    align-items: center;
     padding: 20px 0;
-} */
+}
 
 .board {
     display: grid;
+    /* align-items: center; */
     grid-template-columns: repeat(14, 1fr); /* 7マス × 2（隙間用） */
     grid-template-rows: repeat(14, 1fr); /* 7行 × 2（隙間用） */
     gap: clamp(12px, 2vw, 32px); /* gap増加でマスを大きく見せる */
@@ -150,6 +149,8 @@ header p {
     padding: clamp(20px, 4vw, 60px); /* paddingも増やす */
     border-radius: clamp(10px, 2vw, 20px);
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    /* 中央配置 */
+    margin: 0 auto;
 }
 
 #board-lines {
@@ -221,6 +222,9 @@ header p {
     font-weight: bold;
     margin-top: 5px;
     color: #000000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .square-number {
@@ -231,11 +235,11 @@ header p {
     color: #888;
 }
 #square-0.square.start.big {
-    background-image: url(../images/square_start.png);
+    background-image: url(../images/quiz_mountain_start.png);
     background-size: cover;
 }
 #square-48.square.goal.big {
-    background-image: url(../images/suquare_goal.png);
+    background-image: url(../images/quiz_mountain_goal.png);
     background-size: cover;
 }
 /* プレイヤーピン */

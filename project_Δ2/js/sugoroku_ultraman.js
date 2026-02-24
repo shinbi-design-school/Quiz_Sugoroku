@@ -246,9 +246,9 @@ const quizData = {
 
   28: { 
     question: 'ガッツ星人が得意とする能力は？',
-    options: ['透明化', '巨大化', '催眠', '分身'],
+    options: ['透明化', '巨大化', '分身', '催眠'],
     answer: 2,
-    explanation: '<ul><li>ガッツ星人は催眠能力を持つ。</li></ul>'
+    explanation: '<ul><li>ガッツ星人は分身能力を持つ。</li></ul>'
   },
 
   29: { 
@@ -574,6 +574,28 @@ function createBoard() {
     }
     boardEl.appendChild(div);
   });
+}
+
+// --- パスライン描画 ---
+function drawPathLines() {
+  const svg = document.getElementById('board-lines');
+  const board = document.getElementById('board');
+  if (!svg || !board) return;
+  svg.innerHTML = '';
+  const br = board.getBoundingClientRect();
+  for (let i = 0; i < pathTiles.length - 1; i++) {
+    const a = document.getElementById(`square-${i}`);
+    const b = document.getElementById(`square-${i + 1}`);
+    if (!a || !b) continue;
+    const ra = a.getBoundingClientRect();
+    const rb = b.getBoundingClientRect();
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', ra.left + ra.width / 2 - br.left);
+    line.setAttribute('y1', ra.top + ra.height / 2 - br.top);
+    line.setAttribute('x2', rb.left + rb.width / 2 - br.left);
+    line.setAttribute('y2', rb.top + rb.height / 2 - br.top);
+    svg.appendChild(line);
+  }
 }
 
 // --- 3. ゲーム進行ロジック ---
