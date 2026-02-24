@@ -778,7 +778,7 @@ function goToResult() {
     };
   });
   localStorage.setItem('membersResults', JSON.stringify(results));
-  window.location.href = 'result_members.html';
+  window.location.href = 'result_members.html?stage=1';
 }
 
 window.goToResult  = goToResult;

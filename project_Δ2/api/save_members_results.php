@@ -13,20 +13,24 @@ if (!$payload || !isset($payload['results']) || !is_array($payload['results'])) 
 
 $sessionId = substr(($payload['sessionId'] ?? ''), 0, 36);
 $playersCount = (int)($payload['playersCount'] ?? count($payload['results']));
+$stageNo = isset($payload['stageNo']) ? (int)$payload['stageNo'] : null; // ★追加
 $results = $payload['results'];
 
 try {
   $pdo = db();
   $pdo->beginTransaction();
 
+  // ★ stage_no を INSERT に含める
   $stmt = $pdo->prepare("
     INSERT INTO results
       (created_at, session_id, mode, players_count,
+       stage_no,
        player_name, player_color, avatar_path,
        turn_count, quiz_count, happening_count,
        is_finished, finished_rank)
     VALUES
       (NOW(), :session_id, 'multi', :players_count,
+       :stage_no,
        :name, :color, :path,
        :turn, :quiz, :hap,
        :is_finished, :finished_rank)
@@ -47,6 +51,7 @@ try {
     $stmt->execute([
       ':session_id' => $sessionId ?: null,
       ':players_count' => $playersCount,
+      ':stage_no' => $stageNo,              // ★追加
       ':name' => $name,
       ':color' => $color,
       ':path' => $path,
@@ -60,6 +65,7 @@ try {
 
   $pdo->commit();
   echo json_encode(['ok' => true]);
+
 } catch (Exception $e) {
   if (isset($pdo) && $pdo->inTransaction()) $pdo->rollBack();
   echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
