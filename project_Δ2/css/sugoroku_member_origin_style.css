@@ -222,17 +222,6 @@ header p {
 /* ==========================================
    4. すごろく盤面（ボード）
    ========================================== */
-/* .board-wrapper {
-    width: 100vw;
-    margin-left: calc(-50vw + 50%);
-    margin-right: calc(-50vw + 50%);
-    overflow-x: hidden;
-    display: flex;
-    justify-content: center;
-    background: #f8f9fa;
-    padding: 20px 0;
-} */
-
 .board {
     display: grid;
     grid-template-columns: repeat(14, 1fr); /* 7マス × 2（隙間用） */
@@ -243,12 +232,6 @@ header p {
     max-width: 1600px; /* 最大幅を増やす */
     min-width: 320px; /* スマホ最小幅 */
     aspect-ratio: 1 / 1; /* 正方形に近い盤面 */
-    /* background: #ffffff; */
-    /* 以下、background-imageはugokiに置換予定*/
-    /* background-image: url('../images/MicrosoftTeams-image.png'); */
-    /* background-size: cover; */
-    /* background-position: center; */
-    /* background-repeat: no-repeat; */
     padding: clamp(20px, 4vw, 60px); /* paddingも増やす */
     border-radius: clamp(10px, 2vw, 20px);
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
