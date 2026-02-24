@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>すごろく</title>
-    <link rel="icon" type="image/png" href="../images/pechi.png">
+    <link rel="icon" type="image/png" href="../images/pechi.png" />
     <link rel="stylesheet" href="../css/starnight.css" />
     <link rel="stylesheet" href="../css/sugoroku_ultlaman_origin.css" />
     <link rel="stylesheet" href="../css/style.css" />
@@ -35,7 +35,8 @@
               font-size: 1em;
               text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
             "
-            >プレイヤー:</span>
+            >プレイヤー:</span
+          >
           <span
             id="player-name"
             style="font-size: 1.3em; font-weight: bold"
@@ -75,7 +76,18 @@
 
         <div class="board-wrapper">
           <div class="board" id="board">
-            <svg id="board-lines" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;"></svg>
+            <svg
+              id="board-lines"
+              style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 0;
+              "
+            ></svg>
           </div>
         </div>
       </div>
@@ -194,7 +206,6 @@
       </button>
     </div>
 
-    <!-- ホームに戻るボタン -->
     <div
       class="button-container"
       style="text-align: center; margin: 40px 0; padding-bottom: 100px"
@@ -207,6 +218,12 @@
         onclick="location.href = 'stage_select.html'"
       >
         ステージ選択へ
+      </button>
+      <button
+        class="choice-button"
+        onclick="location.href = 'site_howtouse.html'"
+      >
+        遊び方
       </button>
     </div>
 
