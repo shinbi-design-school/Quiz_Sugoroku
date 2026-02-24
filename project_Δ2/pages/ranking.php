@@ -2,106 +2,194 @@
 require_once __DIR__ . '/../api/db.php';
 $pdo = db();
 
-// 多人数(multi)のみ。クライアントのcalcScoreと同じ式で並べる
-$sql = "
-  SELECT
-  campaign_id,
-  player_name,
-  player_color,
-  SUM(turn_count) AS total_turns
-FROM results
-WHERE mode='multi'
-GROUP BY campaign_id, player_name, player_color
-HAVING COUNT(DISTINCT stage_no) = 4
-ORDER BY total_turns ASC;
-";
-$rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+/* =========================
+   表示モード取得
+========================= */
+$view  = $_GET['view'] ?? 'total'; // total / stage
+$stage = isset($_GET['stage']) ? (int)$_GET['stage'] : 1;
+
+$medals = ['🥇','🥈','🥉'];
+
+/* =========================
+   ステージ別ランキング
+========================= */
+if ($view === 'stage') {
+  $sql = "
+    SELECT
+      player_name,
+      player_color,
+      turn_count,
+      created_at
+    FROM results
+    WHERE mode = 'multi'
+      AND stage_no = :stage
+    ORDER BY turn_count ASC, created_at ASC
+    LIMIT 50
+  ";
+  $stmt = $pdo->prepare($sql);
+  $stmt->execute([':stage' => $stage]);
+  $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+/* =========================
+   合計ランキング（選択式）
+   各ステージの最小ターンを合計
+========================= */
+} else {
+  $sql = "
+    SELECT
+      player_name,
+      player_color,
+      SUM(best_turn) AS total_turns,
+      COUNT(stage_no) AS cleared_stages
+    FROM (
+      SELECT
+        player_name,
+        player_color,
+        stage_no,
+        MIN(turn_count) AS best_turn
+      FROM results
+      WHERE mode = 'multi'
+      GROUP BY player_name, player_color, stage_no
+    ) t
+    GROUP BY player_name, player_color
+    ORDER BY cleared_stages DESC, total_turns ASC
+    LIMIT 50
+  ";
+  $rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+}
 ?>
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>多人数ランキング - 焚火ヴィジランテ</title>
-  <link rel="icon" type="image/png" href="../images/pechi.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Honk:MORF,SHLN@14,35.7&family=Kiwi+Maru&display=swap"
-    rel="stylesheet"
-  />
-  <link rel="stylesheet" href="../css/reset.css" />
-  <link rel="stylesheet" href="../css/op_background_move.css" />
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/ranking.css" />
+<meta charset="utf-8">
+<title>ランキング</title>
+<style>
+body{
+  font-family: system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:#f6f7fb;
+  margin:0;
+  padding:24px;
+}
+.wrap{max-width:900px;margin:0 auto}
+h1{text-align:center;margin-bottom:16px}
+
+/* ナビ */
+.nav{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-bottom:20px;
+}
+.nav a{
+  padding:8px 14px;
+  border-radius:20px;
+  text-decoration:none;
+  font-weight:700;
+  background:#e0e3ff;
+  color:#333;
+}
+.nav a.active{
+  background:#4f6cff;
+  color:#fff;
+}
+
+/* カード */
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:14px 16px;
+  margin:10px 0;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  box-shadow:0 6px 18px rgba(0,0,0,.06);
+}
+.rank{
+  width:50px;
+  text-align:center;
+  font-size:20px;
+  font-weight:900;
+}
+.name{
+  font-size:18px;
+  font-weight:800;
+}
+.dot{
+  display:inline-block;
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  margin-right:8px;
+}
+.score{
+  margin-left:auto;
+  font-size:22px;
+  font-weight:900;
+}
+.sub{
+  font-size:12px;
+  opacity:.7;
+}
+.top1{border:2px solid #f5c542}
+.top2{border:2px solid #c0c0c0}
+.top3{border:2px solid #cd7f32}
+</style>
 </head>
+
 <body>
-  <canvas id="fiber"></canvas>
-  <!-- ヘッダー -->
-  <header class="header">
-    <div class="header-content">
-      <div class="header-left">
-        <span class="header-title">
-          <a href="../index.html">
-            <img class="header-img" src="../images/takibi_logo.png" alt="" />
-          </a>
-        </span>
+<div class="wrap">
+
+<h1>
+<?php if ($view === 'stage'): ?>
+  ステージ<?= $stage ?> ランキング
+<?php else: ?>
+  合計ランキング（ベスト記録）
+<?php endif; ?>
+</h1>
+
+<!-- ナビ -->
+<div class="nav">
+  <a href="ranking.php?view=total" class="<?= $view==='total'?'active':'' ?>">🏆 合計</a>
+  <a href="ranking.php?view=stage&stage=1" class="<?= ($view==='stage' && $stage===1)?'active':'' ?>">S1</a>
+  <a href="ranking.php?view=stage&stage=2" class="<?= ($view==='stage' && $stage===2)?'active':'' ?>">S2</a>
+  <a href="ranking.php?view=stage&stage=3" class="<?= ($view==='stage' && $stage===3)?'active':'' ?>">S3</a>
+  <a href="ranking.php?view=stage&stage=4" class="<?= ($view==='stage' && $stage===4)?'active':'' ?>">S4</a>
+</div>
+
+<?php if (!$rows): ?>
+  <p style="text-align:center;">データがありません。</p>
+<?php endif; ?>
+
+<?php foreach ($rows as $i => $r):
+  $rank = $i + 1;
+  $cls = ($rank===1?'top1':($rank===2?'top2':($rank===3?'top3':'')));
+?>
+  <div class="card <?= $cls ?>">
+    <div class="rank"><?= $rank<=3 ? $medals[$rank-1] : $rank ?></div>
+    <div>
+      <div class="name">
+        <span class="dot" style="background:<?= htmlspecialchars($r['player_color'] ?? '#999') ?>"></span>
+        <?= htmlspecialchars($r['player_name']) ?>
       </div>
-      <button class="hamburger" id="hamburger" aria-label="メニュー">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-      </button>
+      <div class="sub">
+        <?php if ($view === 'total'): ?>
+          クリア数：<?= (int)$r['cleared_stages'] ?> / 4
+        <?php else: ?>
+          <?= htmlspecialchars($r['created_at']) ?>
+        <?php endif; ?>
+      </div>
     </div>
-  </header>
-
-  <!-- ハンバーガーメニュー（オーバーレイ） -->
-  <nav class="menu-overlay" id="menuOverlay">
-    <div class="menu-content">
-      <button class="menu-close" id="menuClose" aria-label="閉じる">
-        &times;
-      </button>
-      <ul class="menu-list">
-        <li><a href="../index.html" class="menu-item">ホーム</a></li>
-        <li><a href="site_howtouse.html" class="menu-item">遊び方</a></li>
-        <li><a href="team.html" class="menu-item">作成者</a></li>
-        <li><a href="documents.html" class="menu-item">資料</a></li>
-      </ul>
-    </div>
-  </nav>
-
-  <!-- メインコンテンツ -->
-  <main class="main-container">
-    <div class="ranking-container">
-      <h1 class="ranking-title">🏆 多人数ランキング 🏆</h1>
-      <?php if (empty($rows)): ?>
-        <p class="ranking-empty">まだランキングデータがありません。</p>
+    <div class="score">
+      <?php if ($view === 'stage'): ?>
+        <?= (int)$r['turn_count'] ?> ターン
       <?php else: ?>
-        <ol class="ranking-list">
-          <?php foreach($rows as $i => $r): ?>
-            <li class="ranking-item <?php echo ($i < 3) ? 'rank-' . ($i + 1) : ''; ?>">
-              <span class="ranking-position"><?php echo $i + 1; ?></span>
-              <span class="ranking-player-name">
-                <?php echo htmlspecialchars($r['player_name'], ENT_QUOTES, 'UTF-8'); ?>
-              </span>
-              <span class="ranking-score">
-                <?php echo (int)$r['total_turns']; ?>ターン
-              </span>
-            </li>
-          <?php endforeach; ?>
-        </ol>
+        <?= (int)$r['total_turns'] ?> ターン
       <?php endif; ?>
-
-      <div class="button-container" style="text-align: center; margin: 40px 0">
-        <button class="choice-button" onclick="location.href = '../index.html'">
-          ホームへ戻る
-        </button>
-      </div>
     </div>
-  </main>
+  </div>
+<?php endforeach; ?>
 
-  <script src="../js/script.js"></script>
-  <script src="../js/op_background_move.js"></script>
-  <script src="../js/ranking.js"></script>
+</div>
 </body>
 </html>
