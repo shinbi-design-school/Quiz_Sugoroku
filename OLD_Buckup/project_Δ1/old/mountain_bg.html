@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Canvas Mountain Background (Spring, Ultra Real)</title>
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #050813;
+      }
+      canvas#bg {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="bg" aria-label="山と雲がスクロールする背景"></canvas>
+
+    <script>
+      (() => {
+        const canvas = document.getElementById("bg");
+        const ctx = canvas.getContext("2d", { alpha: false });
+
+        // ====== 解像度対応 ======
+        let dpr = 1;
+        function resize() {
+          dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+          canvas.width = Math.floor(innerWidth * dpr);
+          canvas.height = Math.floor(innerHeight * dpr);
+        }
+        addEventListener("resize", resize, { passive: true });
+        resize();
+
+        // ====== util ======
+        const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+        const lerp = (a, b, t) => a + (b - a) * t;
+        const smooth = (t) => t * t * (3 - 2 * t);
+        const smoothstep = (a, b, x) => {
+          const t = clamp((x - a) / (b - a), 0, 1);
+          return t * t * (3 - 2 * t);
+        };
+
+        function mulberry32(seed) {
+          let a = seed >>> 0;
+          return () => {
+            a |= 0;
+            a = (a + 0x6d2b79f5) | 0;
+            let t = Math.imul(a ^ (a >>> 15), 1 | a);
+            t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+          };
+        }
+
+        // 周期ノイズ（シームレス）
+        function periodicNoise(x, w, seed) {
+          const t = (x / w) * Math.PI * 2;
+          const a1 = Math.sin(t * 1 + seed * 1.1);
+          const a2 = Math.sin(t * 2 + seed * 2.7);
+          const a3 = Math.sin(t * 4 + seed * 4.3);
+          const a4 = Math.sin(t * 8 + seed * 6.9);
+          return a1 * 0.55 + a2 * 0.25 + a3 * 0.14 + a4 * 0.06;
+        }
+
+        // ====== 空：60秒ループ（朝→昼→夕→夜）=====
+        const DAY_SECONDS = 60;
+        const skyKeys = [
+          { t: 0.0, top: "#2a4c86", bottom: "#f7b07a", sunY: 0.72, moon: 0.0 }, // 朝
+          { t: 0.33, top: "#4db3ff", bottom: "#c8f1ff", sunY: 0.28, moon: 0.0 }, // 昼
+          { t: 0.66, top: "#2a1b5d", bottom: "#ff8a5b", sunY: 0.7, moon: 0.0 }, // 夕
+          { t: 1.0, top: "#050813", bottom: "#0b2340", sunY: 1.2, moon: 1.0 }, // 夜
+        ];
+
+        // 色補間は軽量化のためRGB直 lerp（毎フレーム十分軽い）
+        function hexToRgb(hex) {
+          const h = hex.replace("#", "");
+          const n = parseInt(
+            h.length === 3
+              ? h
+                  .split("")
+                  .map((c) => c + c)
+                  .join("")
+              : h,
+            16,
+          );
+          return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+        }
+        function lerpRgb(a, b, t) {
+          return [
+            lerp(a[0], b[0], t),
+            lerp(a[1], b[1], t),
+            lerp(a[2], b[2], t),
+          ];
+        }
+        function rgbCss([r, g, b], a = 1) {
+          return `rgba(${r | 0},${g | 0},${b | 0},${a})`;
+        }
+
+        const skyRgb = skyKeys.map((k) => ({
+          ...k,
+          topRgb: hexToRgb(k.top),
+          botRgb: hexToRgb(k.bottom),
+        }));
+
+        function sampleSky(phase01) {
+          let a = skyRgb[0],
+            b = skyRgb[1];
+          for (let i = 0; i < skyRgb.length - 1; i++) {
+            if (phase01 >= skyRgb[i].t && phase01 <= skyRgb[i + 1].t) {
+              a = skyRgb[i];
+              b = skyRgb[i + 1];
+              break;
+            }
+          }
+          const span = b.t - a.t || 1;
+          let t = smooth(clamp((phase01 - a.t) / span, 0, 1));
+          const top = lerpRgb(a.topRgb, b.topRgb, t);
+          const bot = lerpRgb(a.botRgb, b.botRgb, t);
+          return {
+            top,
+            bottom: bot,
+            sunY: lerp(a.sunY, b.sunY, t),
+            moon: lerp(a.moon, b.moon, t),
+            // 0..1 暖色寄り指標（朝夕が高め）
+            warmth: clamp(Math.sin(phase01 * Math.PI * 2) * 0.5 + 0.5, 0, 1),
+            phase01,
+          };
+        }
+
+        // 太陽/月
+        function drawSunMoon(sky, W, H) {
+          const sunAlpha = clamp(1 - sky.moon, 0, 1);
+          if (sunAlpha > 0.02) {
+            const cx = W * 0.72;
+            const cy = H * sky.sunY;
+            const r = H * 0.085;
+            const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r * 3.2);
+            g.addColorStop(0.0, `rgba(255,240,200,${0.55 * sunAlpha})`);
+            g.addColorStop(0.25, `rgba(255,210,150,${0.28 * sunAlpha})`);
+            g.addColorStop(1.0, "rgba(255,200,120,0)");
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, W, H);
+
+            const core = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+            core.addColorStop(0.0, `rgba(255,255,240,${0.95 * sunAlpha})`);
+            core.addColorStop(1.0, "rgba(255,255,240,0)");
+            ctx.fillStyle = core;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          if (sky.moon > 0.02) {
+            const mx = W * 0.18,
+              my = H * 0.24;
+            const r = H * 0.055;
+            const halo = ctx.createRadialGradient(mx, my, 0, mx, my, r * 3);
+            halo.addColorStop(0.0, `rgba(220,235,255,${0.35 * sky.moon})`);
+            halo.addColorStop(1.0, "rgba(220,235,255,0)");
+            ctx.fillStyle = halo;
+            ctx.fillRect(0, 0, W, H);
+
+            ctx.fillStyle = `rgba(235,245,255,${0.75 * sky.moon})`;
+            ctx.beginPath();
+            ctx.arc(mx, my, r, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.globalCompositeOperation = "destination-out";
+            ctx.beginPath();
+            ctx.arc(mx + r * 0.35, my - r * 0.1, r * 0.95, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalCompositeOperation = "source-over";
+          }
+        }
+
+        // ====== 雲タイル ======
+        function createCloudTileReal({ tileW, tileH, count, seed }) {
+          const off = document.createElement("canvas");
+          off.width = tileW;
+          off.height = tileH;
+          const c = off.getContext("2d");
+          const rnd = mulberry32(seed);
+
+          function puff(x, y, r, a, tint = "255,255,255") {
+            const rg = c.createRadialGradient(x, y, 0, x, y, r);
+            rg.addColorStop(0.0, `rgba(${tint},${a})`);
+            rg.addColorStop(0.55, `rgba(${tint},${a * 0.55})`);
+            rg.addColorStop(1.0, `rgba(${tint},0)`);
+            c.fillStyle = rg;
+            c.beginPath();
+            c.arc(x, y, r, 0, Math.PI * 2);
+            c.fill();
+          }
+
+          const canFilter = "filter" in c;
+          if (canFilter) c.filter = "blur(3.4px)";
+          for (let i = 0; i < count; i++) {
+            const cx = rnd() * tileW;
+            const cy = (rnd() * 0.45 + 0.06) * tileH;
+            const sc = rnd() * 0.9 + 0.65;
+            const a = rnd() * 0.18 + 0.3;
+
+            for (let k = 0; k < 7; k++) {
+              puff(
+                cx + (rnd() * 70 - 35) * sc + 9,
+                cy + (rnd() * 18 - 9) * sc + 8,
+                (rnd() * 55 + 35) * sc,
+                a * 0.2,
+                "210,225,245",
+              );
+            }
+            for (let k = 0; k < 13; k++) {
+              puff(
+                cx + (rnd() * 95 - 47.5) * sc,
+                cy + (rnd() * 24 - 12) * sc,
+                (rnd() * 70 + 42) * sc,
+                a,
+                "255,255,255",
+              );
+            }
+          }
+          if (canFilter) c.filter = "none";
+          return off;
+        }
+
+        // ====== 霧タイル（ベース）=====
+        function createFogTile({ tileW, tileH, seed }) {
+          const off = document.createElement("canvas");
+          off.width = tileW;
+          off.height = tileH;
+          const c = off.getContext("2d");
+          const rnd = mulberry32(seed);
+
+          const g = c.createLinearGradient(0, 0, 0, tileH);
+          g.addColorStop(0.0, "rgba(255,255,255,0.00)");
+          g.addColorStop(0.4, "rgba(255,255,255,0.14)");
+          g.addColorStop(1.0, "rgba(255,255,255,0.30)");
+          c.fillStyle = g;
+          c.fillRect(0, 0, tileW, tileH);
+
+          const canFilter = "filter" in c;
+          if (canFilter) c.filter = "blur(11px)";
+          for (let i = 0; i < 22; i++) {
+            const y = (rnd() * 0.75 + 0.18) * tileH;
+            const h = (rnd() * 0.2 + 0.08) * tileH;
+            const a = rnd() * 0.11 + 0.07;
+            const rg = c.createLinearGradient(0, y - h, 0, y + h);
+            rg.addColorStop(0, "rgba(255,255,255,0)");
+            rg.addColorStop(0.5, `rgba(255,255,255,${a})`);
+            rg.addColorStop(1, "rgba(255,255,255,0)");
+            c.fillStyle = rg;
+            c.fillRect(0, y - h, tileW, h * 2);
+          }
+          if (canFilter) c.filter = "none";
+
+          c.globalAlpha = 0.11;
+          c.fillStyle = "#fff";
+          for (let i = 0; i < 2400; i++) {
+            const x = rnd() * tileW,
+              y = rnd() * tileH;
+            const r = rnd() * 1.7 + 0.2;
+            c.beginPath();
+            c.arc(x, y, r, 0, Math.PI * 2);
+            c.fill();
+          }
+          c.globalAlpha = 1;
+          return off;
+        }
+
+        // ====== 山タイル：春先（雪増＋溶け斑）＋雪の青影＋奥行き ======
+        function createMountainTileReal({
+          tileW,
+          tileH,
+          baseYRatio,
+          ampRatio,
+          peakColor,
+          midColor,
+          lowColor,
+          snowLineRatio,
+          snowSoftness,
+          shadowStrength,
+          ridgeStrength,
+          textureStrength,
+          blueCrevasse = 0.1,
+          seed = 1,
+        }) {
+          const off = document.createElement("canvas");
+          off.width = tileW;
+          off.height = tileH;
+          const c = off.getContext("2d");
+          const rnd = mulberry32((seed * 10000) | 0);
+
+          const baseY = tileH * baseYRatio;
+          const amp = tileH * ampRatio;
+
+          const step = 3;
+          const count = Math.floor(tileW / step) + 2;
+          const ys = new Float32Array(count);
+
+          // 輪郭
+          c.beginPath();
+          c.moveTo(0, tileH);
+          c.lineTo(0, baseY);
+
+          let idx = 0;
+          for (let x = 0; x <= tileW; x += step) {
+            const n = periodicNoise(x, tileW, seed);
+            const shaped = Math.pow((n + 1) * 0.5, 1.9);
+            const y = baseY - shaped * amp;
+            ys[idx++] = y;
+            c.lineTo(x, y);
+          }
+          c.lineTo(tileW, tileH);
+          c.closePath();
+
+          c.save();
+          c.clip();
+
+          // 標高グラデ
+          const g = c.createLinearGradient(0, baseY - amp, 0, tileH);
+          g.addColorStop(0.0, peakColor);
+          g.addColorStop(0.55, midColor);
+          g.addColorStop(1.0, lowColor);
+          c.fillStyle = g;
+          c.fillRect(0, 0, tileW, tileH);
+
+          // テクスチャ（ムラ）
+          c.globalAlpha = textureStrength;
+          c.fillStyle = "#000";
+          for (let i = 0; i < 2600; i++) {
+            const x = rnd() * tileW;
+            const y = baseY - amp + rnd() * (tileH - (baseY - amp));
+            const r = rnd() * 1.7 + 0.2;
+            c.beginPath();
+            c.arc(x, y, r, 0, Math.PI * 2);
+            c.fill();
+          }
+          c.globalAlpha = 1;
+
+          // 斜光影（固定ベース：山肌のコントラスト）
+          c.globalCompositeOperation = "multiply";
+          const sh = c.createLinearGradient(0, 0, tileW, tileH);
+          sh.addColorStop(0.0, `rgba(0,0,0,${shadowStrength})`);
+          sh.addColorStop(0.55, "rgba(0,0,0,0)");
+          sh.addColorStop(1.0, `rgba(0,0,0,${shadowStrength * 0.78})`);
+          c.fillStyle = sh;
+          c.fillRect(0, 0, tileW, tileH);
+
+          // 奥行き（リリーフ陰影＋谷AO）
+          const invStep = 1 / step;
+          for (let i = 1; i < count - 1; i++) {
+            const y0 = ys[i - 1],
+              y1 = ys[i],
+              y2 = ys[i + 1];
+            const dy = (y2 - y0) * 0.5;
+            const slope = dy * invStep;
+            const curv = y0 + y2 - 2 * y1;
+
+            const shadowA = clamp(-slope * 0.03, 0, 0.18);
+            const aoA = clamp(curv * 0.02, 0, 0.16);
+
+            const a = clamp(shadowA + aoA, 0, 0.22);
+            if (a > 0.002) {
+              c.fillStyle = `rgba(0,0,0,${a})`;
+              c.fillRect((i - 1) * step, 0, step + 1, tileH);
+            }
+          }
+          c.globalCompositeOperation = "source-over";
+
+          // ===== 雪（増やした雪線）=====
+          const snowTop = baseY - amp;
+          const snowStart = snowTop + amp * snowLineRatio;
+          const softness = amp * snowSoftness;
+
+          // ベース雪（春先：控えめ）
+          const sg = c.createLinearGradient(
+            0,
+            snowTop,
+            0,
+            snowStart + softness * 2,
+          );
+          sg.addColorStop(0.0, "rgba(255,255,255,0.78)");
+          sg.addColorStop(0.55, "rgba(248,253,255,0.55)");
+          sg.addColorStop(1.0, "rgba(255,255,255,0.00)");
+          c.fillStyle = sg;
+          c.fillRect(0, snowTop, tileW, snowStart - snowTop + softness * 2);
+
+          // 雪パッチ（高標高＋なだらか）
+          c.save();
+          c.globalCompositeOperation = "screen";
+          c.globalAlpha = 0.55;
+          for (let k = 0; k < 900; k++) {
+            const x = rnd() * tileW;
+            const i = clamp(Math.floor(x / step), 1, count - 2);
+            const slope = (ys[i + 1] - ys[i - 1]) * 0.5 * invStep;
+            const flat = 1 - clamp(Math.abs(slope) * 0.9, 0, 1);
+
+            const n = periodicNoise(x, tileW, seed * 2.17);
+            const yMax = snowStart + (n * 0.5 + 0.5) * softness * 2.2;
+            const y = snowTop + rnd() * (yMax - snowTop);
+            const alt =
+              1 - clamp((y - snowTop) / (yMax - snowTop + 1e-6), 0, 1);
+
+            const strength = flat * alt;
+            if (strength < 0.15) continue;
+
+            const r = (rnd() * 8 + 3) * (0.5 + strength);
+            const gg = c.createRadialGradient(x, y, 0, x, y, r);
+            gg.addColorStop(0.0, `rgba(255,255,255,${0.95 * strength})`);
+            gg.addColorStop(1.0, "rgba(255,255,255,0)");
+            c.fillStyle = gg;
+            c.beginPath();
+            c.arc(x, y, r, 0, Math.PI * 2);
+            c.fill();
+          }
+          c.restore();
+
+          // 溶け斑（削る）
+          c.save();
+          c.globalCompositeOperation = "destination-out";
+          c.globalAlpha = 0.55;
+          const canFilter = "filter" in c;
+          if (canFilter) c.filter = "blur(2.0px)";
+          for (let k = 0; k < 520; k++) {
+            const x = rnd() * tileW;
+            const n = periodicNoise(x, tileW, seed * 3.03);
+            const yMax = snowStart + (n * 0.5 + 0.5) * softness * 2.0;
+            const y = snowTop + rnd() * (yMax - snowTop);
+            const melt = smoothstep(snowTop + softness * 0.3, yMax, y);
+            if (melt < 0.25) continue;
+
+            const r = (rnd() * 9 + 4) * melt;
+            const gg = c.createRadialGradient(x, y, 0, x, y, r);
+            gg.addColorStop(0.0, `rgba(0,0,0,${0.85 * melt})`);
+            gg.addColorStop(1.0, "rgba(0,0,0,0)");
+            c.fillStyle = gg;
+            c.beginPath();
+            c.arc(x, y, r, 0, Math.PI * 2);
+            c.fill();
+          }
+          if (canFilter) c.filter = "none";
+          c.restore();
+
+          // ===== 雪の青影（クレバス風：ほんの少し）=====
+          // 高標高ほど強く、谷(曲率)ほど強く。色は青みの暗影。
+          c.save();
+          c.globalCompositeOperation = "multiply";
+          for (let i = 1; i < count - 1; i++) {
+            const x = (i - 1) * step;
+            const y = ys[i];
+            // 標高判定：雪域に近いほど
+            const alt =
+              1 -
+              clamp(
+                (y - snowTop) / (snowStart + softness * 2 - snowTop + 1e-6),
+                0,
+                1,
+              );
+            if (alt < 0.25) continue;
+
+            const curv = ys[i - 1] + ys[i + 1] - 2 * ys[i]; // 谷ほど正
+            const crease = clamp(curv * 0.06, 0, 1);
+
+            // ノイズで筋っぽさ
+            const n = periodicNoise(x, tileW, seed * 5.21) * 0.5 + 0.5;
+            const streak = smoothstep(0.55, 0.9, n);
+
+            const a = clamp(
+              blueCrevasse *
+                alt *
+                (0.35 + 0.65 * crease) *
+                (0.35 + 0.65 * streak),
+              0,
+              0.12,
+            );
+            if (a < 0.003) continue;
+
+            // 上部のみ薄く
+            const topY = snowTop;
+            const botY = snowStart + softness * 1.4;
+            const vg = c.createLinearGradient(0, topY, 0, botY);
+            vg.addColorStop(0.0, `rgba(90,140,200,${a})`);
+            vg.addColorStop(1.0, `rgba(90,140,200,0)`);
+            c.fillStyle = vg;
+            c.fillRect(x, topY, step + 1, botY - topY);
+          }
+          c.restore();
+
+          // 稜線ハイライト
+          c.globalAlpha = ridgeStrength;
+          c.strokeStyle = "rgba(255,255,255,0.32)";
+          c.lineWidth = 1.2;
+          c.beginPath();
+          c.moveTo(0, ys[0]);
+          for (let i = 1, x = step; x <= tileW; i++, x += step)
+            c.lineTo(x, ys[i] || baseY);
+          c.stroke();
+          c.globalAlpha = 1;
+
+          c.restore();
+          return off;
+        }
+
+        // ====== タイル準備 ======
+        const TILE_W = 1500,
+          MT_H = 720;
+
+        const cloudTileFar = createCloudTileReal({
+          tileW: TILE_W,
+          tileH: 360,
+          count: 7,
+          seed: 2026,
+        });
+        const cloudTileNear = createCloudTileReal({
+          tileW: TILE_W,
+          tileH: 440,
+          count: 5,
+          seed: 202602,
+        });
+        const fogTileFar = createFogTile({
+          tileW: TILE_W,
+          tileH: 240,
+          seed: 777,
+        });
+        const fogTileNear = createFogTile({
+          tileW: TILE_W,
+          tileH: 280,
+          seed: 778,
+        });
+
+        // 既に反映済みパラメータ：
+        // snowLineRatio 小さく（雪増） / shadowStrength +0.03 / 霞 0.08 / fogAlpha ベースUP
+        const farMount = createMountainTileReal({
+          tileW: TILE_W,
+          tileH: MT_H,
+          baseYRatio: 0.72,
+          ampRatio: 0.33,
+          peakColor: "#3a556f",
+          midColor: "#2c3f56",
+          lowColor: "#24364d",
+          snowLineRatio: 0.17,
+          snowSoftness: 0.12,
+          shadowStrength: 0.21,
+          ridgeStrength: 0.12,
+          textureStrength: 0.1,
+          blueCrevasse: 0.07,
+          seed: 11.3,
+        });
+        const midMount = createMountainTileReal({
+          tileW: TILE_W,
+          tileH: MT_H,
+          baseYRatio: 0.8,
+          ampRatio: 0.42,
+          peakColor: "#3a4f57",
+          midColor: "#2f3f3c",
+          lowColor: "#2f6a40",
+          snowLineRatio: 0.24,
+          snowSoftness: 0.12,
+          shadowStrength: 0.25,
+          ridgeStrength: 0.14,
+          textureStrength: 0.13,
+          blueCrevasse: 0.09,
+          seed: 22.9,
+        });
+        const nearMount = createMountainTileReal({
+          tileW: TILE_W,
+          tileH: MT_H,
+          baseYRatio: 0.88,
+          ampRatio: 0.54,
+          peakColor: "#3b4a45",
+          midColor: "#2f3a34",
+          lowColor: "#2f8a49",
+          snowLineRatio: 0.26,
+          snowSoftness: 0.1,
+          shadowStrength: 0.29,
+          ridgeStrength: 0.18,
+          textureStrength: 0.15,
+          blueCrevasse: 0.1,
+          seed: 33.7,
+        });
+
+        // ====== スクロール状態 ======
+        let prev = performance.now();
+        let xCloudFar = 0,
+          xCloudNear = 0;
+        let xFar = 0,
+          xMid = 0,
+          xNear = 0;
+        let xFogFar = 0,
+          xFogNear = 0;
+
+        const speed = {
+          cloudFar: 10,
+          cloudNear: 18,
+          far: 22,
+          mid: 40,
+          near: 70,
+          fogFar: 10,
+          fogNear: 14,
+        };
+
+        // 通常タイル描画
+        function drawTiled(img, offsetX, y, w, h, alpha = 1) {
+          const tileW = img.width;
+          let x = -((offsetX % tileW) + tileW) % tileW;
+          ctx.globalAlpha = alpha;
+          while (x < canvas.width) {
+            ctx.drawImage(img, x, y, w, h);
+            x += w;
+          }
+          ctx.globalAlpha = 1;
+        }
+
+        // 霧：高さうねり付きタイル描画（谷に溜まって流れる感じ）
+        function drawTiledWave(
+          img,
+          offsetX,
+          baseY,
+          w,
+          h,
+          alpha,
+          time,
+          ampPx,
+          freq,
+          phase,
+        ) {
+          const tileW = img.width;
+          let x = -((offsetX % tileW) + tileW) % tileW;
+          ctx.globalAlpha = alpha;
+
+          while (x < canvas.width) {
+            // x位置と時間でうねり（複合波で自然に）
+            const u = x / (w || 1);
+            const yOff =
+              Math.sin(u * freq + time * 0.0008 + phase) * ampPx +
+              Math.sin(u * freq * 0.55 - time * 0.00055 + phase * 1.7) *
+                (ampPx * 0.55);
+
+            ctx.drawImage(img, x, baseY + yOff, w, h);
+            x += w;
+          }
+          ctx.globalAlpha = 1;
+        }
+
+        // ====== 時間帯で影方向を変えるための “ライト推定” ======
+        // 朝(0..0.33): 左→中央 / 夕(0.33..0.66): 中央→右 / 夜: 月の弱光
+        function lightFromTime(sky) {
+          const p = sky.phase01;
+          let sunX = 0.72; // 描画の太陽位置と同程度
+          let elevation = 0.9; // 高いほど上から
+
+          if (p < 0.66) {
+            // 日中（朝〜夕）
+            const dayP = p / 0.66; // 0..1
+            // 朝=0.18 → 昼=0.55 → 夕=0.82
+            if (dayP < 0.5) sunX = lerp(0.18, 0.55, smooth(dayP / 0.5));
+            else sunX = lerp(0.55, 0.82, smooth((dayP - 0.5) / 0.5));
+
+            // 太陽高度：朝夕は低い、昼は高い
+            const mid = 1 - Math.abs(dayP - 0.5) * 2; // 0(朝夕)〜1(昼)
+            elevation = lerp(0.25, 0.95, smooth(mid)); // 朝夕低い＝0.25
+          } else {
+            // 夜：月光（弱い）
+            sunX = 0.18;
+            elevation = 0.35;
+          }
+
+          // 方向ベクトル（画面上での光の向き：右が+）
+          // 光が左にあると、右側へ影が伸びる＝陰影のグラデ方向が変わる
+          const dirX = clamp((0.5 - sunX) * 1.6, -1, 1); // -1..1
+          return { sunX, elevation, dirX };
+        }
+
+        // 山に時間帯依存の陰影を重ねる（乗算）＋リムライト（スクリーン）
+        function applyDirectionalLightToMountains(
+          mountRect,
+          light,
+          intensity,
+          warm,
+        ) {
+          const { x, y, w, h } = mountRect;
+
+          // 朝夕は影強め、昼は弱め
+          const shadowK = intensity; // 0..1
+
+          // 影（multiply）：方向はdirXで左右反転。高度が低いほどコントラスト強く
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(x, y, w, h);
+          ctx.clip();
+          ctx.globalCompositeOperation = "multiply";
+          ctx.globalAlpha =
+            lerp(0.06, 0.22, shadowK) * (0.65 + 0.35 * (1 - light.elevation)); // 朝夕強
+          const gx = ctx.createLinearGradient(
+            x + (light.dirX > 0 ? 0 : w),
+            y,
+            x + (light.dirX > 0 ? w : 0),
+            y + h * 0.2,
+          );
+          gx.addColorStop(0.0, "rgba(0,0,0,0.75)");
+          gx.addColorStop(0.55, "rgba(0,0,0,0.00)");
+          gx.addColorStop(1.0, "rgba(0,0,0,0.35)");
+          ctx.fillStyle = gx;
+          ctx.fillRect(x, y, w, h);
+
+          // リムライト（screen）：光の当たる側に暖色寄りの薄い縁
+          ctx.globalCompositeOperation = "screen";
+          ctx.globalAlpha =
+            lerp(0.02, 0.1, shadowK) * (0.55 + 0.45 * (1 - light.elevation));
+          const rim = ctx.createLinearGradient(
+            x + (light.dirX > 0 ? w : 0),
+            y,
+            x + (light.dirX > 0 ? 0 : w),
+            y,
+          );
+          const rimCol =
+            warm > 0.5 ? "rgba(255,200,150,1)" : "rgba(190,220,255,1)";
+          rim.addColorStop(0.0, rimCol);
+          rim.addColorStop(0.18, "rgba(255,255,255,0)");
+          ctx.fillStyle = rim;
+          ctx.fillRect(x, y, w, h);
+
+          ctx.restore();
+        }
+
+        // ====== 描画 ======
+        function render(nowMs) {
+          const W = canvas.width,
+            H = canvas.height;
+          const phase = ((nowMs / 1000) % DAY_SECONDS) / DAY_SECONDS;
+          const sky = sampleSky(phase);
+
+          // 空グラデ
+          const grad = ctx.createLinearGradient(0, 0, 0, H);
+          grad.addColorStop(0, rgbCss(sky.top, 1));
+          grad.addColorStop(1, rgbCss(sky.bottom, 1));
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, W, H);
+
+          drawSunMoon(sky, W, H);
+
+          // 雲
+          const cloudH1 = Math.floor(H * 0.35);
+          const cloudW1 = Math.floor(
+            (cloudTileFar.width / cloudTileFar.height) * cloudH1,
+          );
+          drawTiled(cloudTileFar, xCloudFar, 0, cloudW1, cloudH1, 0.7);
+
+          const cloudH2 = Math.floor(H * 0.42);
+          const cloudW2 = Math.floor(
+            (cloudTileNear.width / cloudTileNear.height) * cloudH2,
+          );
+          drawTiled(
+            cloudTileNear,
+            xCloudNear,
+            Math.floor(H * 0.03),
+            cloudW2,
+            cloudH2,
+            0.55,
+          );
+
+          // 空気感（霞）UP：0.08
+          ctx.fillStyle = "rgba(255,255,255,0.08)";
+          ctx.fillRect(0, 0, W, Math.floor(H * 0.55));
+
+          // 山
+          const mountH = Math.floor(H * 0.8);
+          const mountY = H - mountH;
+          const drawW = Math.floor((TILE_W / MT_H) * mountH);
+
+          drawTiled(farMount, xFar, mountY + H * 0.02, drawW, mountH, 0.9);
+          drawTiled(midMount, xMid, mountY + H * 0.06, drawW, mountH, 0.96);
+          drawTiled(nearMount, xNear, mountY + H * 0.1, drawW, mountH, 1.0);
+
+          // 時間帯で影方向を変える（朝夕で低い光＝強い方向性）
+          const light = lightFromTime(sky);
+          const dayFactor =
+            phase < 0.66 ? 1 - Math.abs(phase / 0.66 - 0.5) * 2 : 0; // 0..1 昼ピーク
+          const lowSun = 1 - dayFactor; // 朝夕ほど1
+          applyDirectionalLightToMountains(
+            { x: 0, y: mountY, w: W, h: mountH },
+            light,
+            lowSun,
+            sky.warmth,
+          );
+
+          // 霧（濃く + うねり + 2層）
+          const fogY = Math.floor(H * 0.63);
+          const fogAlpha = lerp(0.28, 0.4, sky.moon); // 濃く
+          const t = nowMs;
+
+          // 遠い霧（ゆっくり、うねり小）
+          const fogH1 = Math.floor(H * 0.2);
+          const fogW1 = Math.floor(
+            (fogTileFar.width / fogTileFar.height) * fogH1,
+          );
+          drawTiledWave(
+            fogTileFar,
+            xFogFar,
+            fogY - Math.floor(H * 0.02),
+            fogW1,
+            fogH1,
+            fogAlpha * 0.75,
+            t,
+            H * 0.012,
+            2.2,
+            0.3,
+          );
+
+          // 近い霧（やや濃い、うねり大）
+          const fogH2 = Math.floor(H * 0.26);
+          const fogW2 = Math.floor(
+            (fogTileNear.width / fogTileNear.height) * fogH2,
+          );
+          drawTiledWave(
+            fogTileNear,
+            xFogNear,
+            fogY,
+            fogW2,
+            fogH2,
+            fogAlpha,
+            t,
+            H * 0.018,
+            2.8,
+            1.1,
+          );
+
+          // 霧の縦なじみ（下ほど濃い）
+          const fg = ctx.createLinearGradient(0, fogY, 0, fogY + fogH2);
+          fg.addColorStop(0.0, "rgba(255,255,255,0.00)");
+          fg.addColorStop(0.6, `rgba(255,255,255,${fogAlpha * 0.95})`);
+          fg.addColorStop(1.0, `rgba(255,255,255,${fogAlpha * 1.25})`);
+          ctx.fillStyle = fg;
+          ctx.fillRect(0, fogY, W, fogH2);
+
+          // 地面
+          const groundH = Math.floor(H * 0.12);
+          ctx.fillStyle = "rgba(10,16,24,0.85)";
+          ctx.fillRect(0, H - groundH, W, groundH);
+        }
+
+        // ====== ループ ======
+        function tick(now) {
+          const dt = Math.min(0.033, (now - prev) / 1000);
+          prev = now;
+          const px = dpr;
+
+          xCloudFar += speed.cloudFar * dt * px;
+          xCloudNear += speed.cloudNear * dt * px;
+          xFar += speed.far * dt * px;
+          xMid += speed.mid * dt * px;
+          xNear += speed.near * dt * px;
+
+          xFogFar += speed.fogFar * dt * px;
+          xFogNear += speed.fogNear * dt * px;
+
+          render(now);
+          requestAnimationFrame(tick);
+        }
+
+        requestAnimationFrame(tick);
+      })();
+    </script>
+  </body>
+</html>
