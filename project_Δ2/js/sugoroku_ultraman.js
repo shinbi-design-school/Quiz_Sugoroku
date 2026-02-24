@@ -361,7 +361,8 @@ let gameState = {
   playerName: '',
   playerColor: '#00BFFF',
   avatarPath: '',
-  happeningCount: 0
+  happeningCount: 0,
+  overshootCount: 0
 };
 
 // ========== URLパラメータからプレイヤー情報を取得 ==========
@@ -643,14 +644,22 @@ if (rollBtn && dice && diceModal) {
 function attemptMove(steps) {
   const target = gameState.currentPosition + steps;
   if (target >= boardDataLinear.length) {
+    gameState.overshootCount++;
+    if (gameState.overshootCount >= 6) {
+      showEvent('','','6回オーバーしたのでゴールへ進みます！', 'info');
+      gameState.overshootCount = 0;
+      movePlayer(boardDataLinear.length - 1);
+      return;
+    }
     showEvent('','','ゴールを超えてしまいます！', 'error');
     rollBtn.disabled = false;
     return;
   }
+  gameState.overshootCount = 0;
   movePlayer(target);
 }
 
-function movePlayer(target, options = { triggerEvent: true }) {
+function movePlayer(target, options = { triggerEvent: true, countTurn: true }) {
   const pin = document.getElementById('player-pin');
   const currentPos = gameState.currentPosition;
   
@@ -677,7 +686,7 @@ function movePlayer(target, options = { triggerEvent: true }) {
         clearInterval(moveInterval);
         
         gameState.currentPosition = target;
-        gameState.turnCount++;
+        if (options.countTurn) gameState.turnCount++;
         updateInfo();
 
         setTimeout(() => { handleSquareEvent(target); }, 600);
@@ -706,7 +715,7 @@ function movePlayer(target, options = { triggerEvent: true }) {
         clearInterval(moveInterval);
         
         gameState.currentPosition = target;
-        gameState.turnCount++;
+        if (options.countTurn) gameState.turnCount++;
         updateInfo();
 
         if (options.triggerEvent) {
@@ -720,7 +729,7 @@ function movePlayer(target, options = { triggerEvent: true }) {
   } else {
     // 同じ位置の場合（通常発生しない）
     gameState.currentPosition = target;
-    gameState.turnCount++;
+    if (options.countTurn) gameState.turnCount++;
     updateInfo();
     
     if (options.triggerEvent) {
@@ -747,7 +756,7 @@ function handleSquareEvent(pos) {
       gameState.happeningCount++; // アクシデントマスのカウントを増やす
       showEvent('💥', 'アクシデント！', `${tile.name}\n${Math.abs(tile.effect)}マス戻ります...`, () => {
         const newPos = Math.max(pos + tile.effect, 0);
-        movePlayer(newPos, { triggerEvent: false });
+        movePlayer(newPos, { triggerEvent: false, countTurn: false });
       });
       break;
     case 'goal':
@@ -786,7 +795,7 @@ function showQuiz(quizId) {
           // メッセージエリアに表示
           showEvent('❌', '', '残念！不正解です。<br>2マス戻ります！', () => {
             const backPos = Math.max(gameState.currentPosition - 2, 0);
-            movePlayer(backPos, { triggerEvent: false });
+            movePlayer(backPos, { triggerEvent: false, countTurn: false });
           });
         }, 300);
       }

@@ -472,12 +472,9 @@
           "#playersGrid .player-name-input",
         );
         const players = Array.from(inputs).map((inp, i) => {
-          const activePreset = document.querySelector(
-            `#presets${i} .preset-dot.active`,
-          );
-          const color = activePreset
-            ? activePreset.dataset.hex
-            : DEFAULT_COLORS[i];
+          // カラーピッカーの値を優先的に使用（プリセット・カスタム両方に対応）
+          const colorPicker = document.getElementById(`colorPicker${i}`);
+          const color = colorPicker ? colorPicker.value : DEFAULT_COLORS[i];
           return {
             name: inp.value.trim(),
             color: color,

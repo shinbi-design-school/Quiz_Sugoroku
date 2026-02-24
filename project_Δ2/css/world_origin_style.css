@@ -233,11 +233,11 @@ header p {
     color: #888;
 }
 #square-0.square.start.big {
-    background-image: url(../images/square_start.png);
+    background-image: url(../images/worldstart.jpg);
     background-size: cover;
 }
 #square-48.square.goal.big {
-    background-image: url(../images/suquare_goal.png);
+    background-image: url(../images/worldgoal.jpg);
     background-size: cover;
 }
 /* プレイヤーピン */

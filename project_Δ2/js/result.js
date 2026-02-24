@@ -49,7 +49,7 @@ function displayResult() {
     // アクシデント回数を表示
     const hapningCountElement = document.getElementById('resultHapningCount');
     if (hapningCountElement) {
-        hapningCountElement.textContent = resultData.hapningCount || 0;
+        hapningCountElement.textContent = resultData.happeningCount || 0;
     }
     
     // ランクとコメントを計算・表示

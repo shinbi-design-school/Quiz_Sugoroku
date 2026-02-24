@@ -128,6 +128,7 @@ let gameState = {
   playerColor: '#00BFFF',
   avatarPath: AVATAR_PATH,
   happeningCount: 0,
+  overshootCount: 0,
 };
 
 // ========== URLパラメータからプレイヤー情報を取得 ==========
@@ -276,12 +277,22 @@ if (rollBtn) {
 function attemptMove(steps) {
   var target = gameState.currentPosition + steps;
   if (target >= boardDataLinear.length) {
+    gameState.overshootCount++;
+    if (gameState.overshootCount >= 6) {
+      // 6回目：強制的にゴールへ移動
+      showEvent('⚠️', '', '6回オーバーしたのでゴールへ進みます！', function() {
+        gameState.overshootCount = 0;
+        movePlayer(boardDataLinear.length - 1, { triggerEvent: true, countTurn: true });
+      });
+      return;
+    }
     showEvent('⚠️', '', 'ゴールを超えてしまいます！<br>もう少し！', function() {
       gameState.turnCount++;
       updateInfo();
     });
     return;
   }
+  gameState.overshootCount = 0;
   movePlayer(target, { triggerEvent: true, countTurn: true });
 }
 

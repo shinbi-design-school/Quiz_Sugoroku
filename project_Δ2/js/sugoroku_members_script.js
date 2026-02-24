@@ -134,6 +134,7 @@ let gameState = {
   playerColor: '#00BFFF',
   avatarPath: AVATAR_PATH,
   happeningCount: 0,
+  overshootCount: 0,
 };
 
 // 'order' = 先攻決め中 / 'play' = ゲーム中 / 'done' = 終了
@@ -166,6 +167,7 @@ window.addEventListener('DOMContentLoaded', () => {
     turnCount: 0,
     quizCleared: [],
     happeningCount: 0,
+    overshootCount: 0,
     isFinished: false,
     finishedRank: 0,
   }));
@@ -442,6 +444,7 @@ function activatePlayer(idx) {
   gameState.turnCount       = s.turnCount;
   gameState.quizCleared     = s.quizCleared.slice();
   gameState.happeningCount  = s.happeningCount;
+  gameState.overshootCount  = s.overshootCount;
   gameState.isRolling       = false;
   gameState.playerName      = p.name;
   gameState.playerColor     = p.color;
@@ -463,6 +466,7 @@ function saveCurrentPlayerState() {
   playerStates[idx].turnCount       = gameState.turnCount;
   playerStates[idx].quizCleared     = gameState.quizCleared.slice();
   playerStates[idx].happeningCount  = gameState.happeningCount;
+  playerStates[idx].overshootCount  = gameState.overshootCount;
 }
 
 // 1ターン制ローテーション：次のプレイヤーへ
@@ -541,12 +545,22 @@ if (rollBtn) {
 function attemptMove(steps) {
   var target = gameState.currentPosition + steps;
   if (target >= boardDataLinear.length) {
+    gameState.overshootCount++;
+    if (gameState.overshootCount >= 6) {
+      // 6回目：強制的にゴールへ移動
+      showEvent('⚠️', '', '6回オーバーしたのでゴールへ進みます！', function() {
+        gameState.overshootCount = 0;
+        movePlayer(boardDataLinear.length - 1, { triggerEvent: true, countTurn: true });
+      });
+      return;
+    }
     showEvent('⚠️', '', 'ゴールを超えてしまいます！<br>もう少し！', function() {
       gameState.turnCount++;
       endTurnAndRotate();
     });
     return;
   }
+  gameState.overshootCount = 0;
   movePlayer(target, { triggerEvent: true, countTurn: true });
 }
 

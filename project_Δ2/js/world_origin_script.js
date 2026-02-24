@@ -107,7 +107,8 @@ let gameState = {
   playerName: '',
   playerColor: '#00BFFF',
   avatarPath: '',
-  happeningCount: 0
+  happeningCount: 0,
+  overshootCount: 0
 };
 
 // ========== URLパラメータからプレイヤー情報を取得 ==========
@@ -367,10 +368,18 @@ if (rollBtn && dice && diceModal) {
 function attemptMove(steps) {
   const target = gameState.currentPosition + steps;
   if (target >= boardDataLinear.length) {
+    gameState.overshootCount++;
+    if (gameState.overshootCount >= 6) {
+      showEvent('','','6回オーバーしたのでゴールへ進みます！', 'info');
+      gameState.overshootCount = 0;
+      movePlayer(boardDataLinear.length - 1);
+      return;
+    }
     showEvent('','','ゴールを超えてしまいます！', 'error');
     rollBtn.disabled = false;
     return;
   }
+  gameState.overshootCount = 0;
   movePlayer(target);
 }
 
@@ -565,6 +574,28 @@ function closeEventModal() {
 
 function resetGame() {
   location.reload();
+}
+
+// --- パスライン描画 ---
+function drawPathLines() {
+  const svg   = document.getElementById('board-lines');
+  const board = document.getElementById('board');
+  if (!svg || !board) return;
+  svg.innerHTML = '';
+  const br = board.getBoundingClientRect();
+  for (let i = 0; i < pathTiles.length - 1; i++) {
+    const a = document.getElementById('square-' + i);
+    const b = document.getElementById('square-' + (i + 1));
+    if (!a || !b) continue;
+    const ra = a.getBoundingClientRect();
+    const rb = b.getBoundingClientRect();
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', ra.left + ra.width  / 2 - br.left);
+    line.setAttribute('y1', ra.top  + ra.height / 2 - br.top);
+    line.setAttribute('x2', rb.left + rb.width  / 2 - br.left);
+    line.setAttribute('y2', rb.top  + rb.height / 2 - br.top);
+    svg.appendChild(line);
+  }
 }
 
 function initGame() {
