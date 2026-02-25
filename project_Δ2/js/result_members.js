@@ -11,6 +11,12 @@ window.addEventListener('DOMContentLoaded', () => {
     displayRanking();
 });
 
+
+function getStageNo() {
+  const n = Number(new URLSearchParams(location.search).get('stage'));
+  return Number.isFinite(n) ? n : null;
+}
+
 // ===================================================
 // ▼ ランク評価（1人用と同じロジック）
 // ===================================================
@@ -39,7 +45,7 @@ function displayRanking() {
     const raw = localStorage.getItem('membersResults');
     if (!raw) {
         alert('結果データが見つかりません。');
-        window.location.href = '../index.html';
+        window.location.href = 'index.html';
         return;
     }
 
@@ -126,30 +132,55 @@ function goToHome() {
     localStorage.removeItem('membersResults');
     localStorage.removeItem('membersPlayers');
     localStorage.removeItem('membersCurrentTurn');
-    window.location.href = '../index.html';
+    window.location.href = 'index.html';
 }
 // ===================================================
 // ▼ DB保存（多人数結果をPHPへ送信）
 // ===================================================
 function sendMembersResultsToServer(results) {
-  // 試合ID（同じ試合を束ねる）
+  // 1. 重複送信チェック
   let sessionId = localStorage.getItem('multiSessionId');
   if (!sessionId) {
     sessionId = (crypto?.randomUUID?.() ?? String(Date.now()));
     localStorage.setItem('multiSessionId', sessionId);
   }
+  //const sentKey = 'membersResultsSent:' + sessionId;
+  //if (localStorage.getItem(sentKey) === '1') return;
 
-  // 二重送信防止（リロード対策）
-  const sentKey = 'membersResultsSent:' + sessionId;
-  if (localStorage.getItem(sentKey) === '1') return;
+  // 2. ステージ番号取得
+  const urlParams = new URLSearchParams(location.search);
+  const stage = urlParams.get('stage');
 
+  // 3. 送信データ作成
   const payload = {
+    sessionId: localStorage.getItem('multiSessionId') || ('stage-' + Date.now()),
+    playersCount: results.length,
+    stageNo: stage ? parseInt(stage, 10) : 1, // ここが重要！
+    results: results
+  };
+
+  // 4. fetch実行
+  fetch('api/save_members_results.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (res.ok || res.status === 'success') { // APIの戻り値に合わせて調整
+      localStorage.setItem(sentKey, '1');
+      console.log('保存成功');
+    }
+  })
+  .catch(err => console.error('通信エラー:', err));
+}  
+/*const payload = {
     sessionId,
     playersCount: results.length,
     results
   };
 
-  fetch('../api/save_members_results.php', {
+  fetch('api/save_members_results.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
@@ -162,5 +193,19 @@ function sendMembersResultsToServer(results) {
       console.warn('保存失敗:', res.error);
     }
   })
-  .catch(err => console.error('通信エラー:', err));
-}
+  .catch(err => console.error('通信エラー:', err));*/
+
+// 結果発表（ランキング）へ
+document.getElementById('btnRanking')?.addEventListener('click', () => {
+  const stage = new URLSearchParams(location.search).get('stage');
+  if (stage) {
+    location.href = `ranking.php?view=stage&stage=${stage}`;
+  } else {
+    location.href = 'ranking.php?view=total';
+  }
+});
+
+// 次のステージ選択へ
+document.getElementById('btnNextStage')?.addEventListener('click', () => {
+  location.href = 'stage_select.html';
+});
