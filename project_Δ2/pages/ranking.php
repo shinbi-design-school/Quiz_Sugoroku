@@ -1,12 +1,26 @@
 <?php
-require_once __DIR__ . '/../api/db.php';
+require_once __DIR__ . '/api/db.php';
 $pdo = db();
 
 /* =========================
-   表示モード取得
+   表示モード取得（修正版）
 ========================= */
-$view  = $_GET['view'] ?? 'total'; // total / stage
-$stage = isset($_GET['stage']) ? (int)$_GET['stage'] : 1;
+// 1. まず stage 番号を確実に取得する
+if (isset($_GET['stage']) && is_numeric($_GET['stage'])) {
+    $stage = (int)$_GET['stage'];
+} else {
+    $stage = 1; // 指定がない場合はデフォルトで1
+}
+
+// 2. view モードを判定する
+// stage パラメータが明示的にある場合は 'stage' モードとする
+if (isset($_GET['view']) && $_GET['view'] === 'stage') {
+    $view = 'stage';
+} elseif (isset($_GET['stage'])) {
+    $view = 'stage';
+} else {
+    $view = $_GET['view'] ?? 'total';
+}
 
 $medals = ['🥇','🥈','🥉'];
 
@@ -31,8 +45,7 @@ if ($view === 'stage') {
   $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 /* =========================
-   合計ランキング（選択式）
-   各ステージの最小ターンを合計
+   合計ランキング
 ========================= */
 } else {
   $sql = "
@@ -55,7 +68,9 @@ if ($view === 'stage') {
     ORDER BY cleared_stages DESC, total_turns ASC
     LIMIT 50
   ";
-  $rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+  $stmt = $pdo->prepare($sql); // prepareに統一
+  $stmt->execute();
+  $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 ?>
 <!doctype html>
@@ -141,6 +156,10 @@ h1{text-align:center;margin-bottom:16px}
 <div class="wrap">
 
 <h1>
+  <div style="background:#fff; color:red; padding:10px; border:1px solid red;">
+  現在のモード: <?= htmlspecialchars($view) ?><br>
+  現在のステージ番号: <?= htmlspecialchars($stage) ?>
+</div>
 <?php if ($view === 'stage'): ?>
   ステージ<?= $stage ?> ランキング
 <?php else: ?>

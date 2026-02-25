@@ -263,10 +263,10 @@
           </p>
         </div>
 
-        <!-- 準備中2 -->
+        <!-- 世界の首都クイズ -->
         <div class="stage-card" id="stageWorld">
           <div class="stage-icon">✈️</div>
-          <h2 class="stage-name">せかいの首都クイズ</h2>
+          <h2 class="stage-name">世界の首都クイズ</h2>
           <p class="stage-description">
             世界の首都を知るクイズ！<br />
             旅を楽しもう！
@@ -288,7 +288,7 @@
           if (playMode === "solo") {
             location.href = "sugoroku_origin.html";
           } else {
-            location.href = "sugoroku_members_play.html";
+            location.href = "sugoroku_members_play.html?stage=1";
           }
         });
 
@@ -302,7 +302,7 @@
           if (playMode === "solo") {
             location.href = "quiz_mountain.html";
           } else {
-            location.href = "quiz_mountain_members.html";
+            location.href = "quiz_mountain_members.html?stage=2";
           }
         });
 
@@ -316,7 +316,7 @@
           if (playMode === "solo") {
             location.href = "sugoroku_ultlaman.html";
           } else {
-            location.href = "sugoroku_ultraman_member.html";
+            location.href = "sugoroku_ultraman_member.html?stage=3";
           }
         });
 
@@ -330,7 +330,7 @@
           if (playMode === "solo") {
             location.href = "world_origin.html";
           } else {
-            location.href = "world_members.html";
+            location.href = "world_members.html?stage=4";
           }
         });
     </script>

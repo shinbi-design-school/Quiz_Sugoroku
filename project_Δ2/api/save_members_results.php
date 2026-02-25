@@ -1,72 +1,67 @@
 <?php
-// api/save_members_results.php
-header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/db.php';
+$pdo = db();
 
-$raw = file_get_contents('php://input');
-$payload = json_decode($raw, true);
+// JSON入力を受け取る
+$json = file_get_contents('php://input');
+$data = json_decode($json, true);
 
-if (!$payload || !isset($payload['results']) || !is_array($payload['results'])) {
-  echo json_encode(['ok' => false, 'error' => 'invalid payload']);
-  exit;
+if (!$data || !isset($data['results'])) {
+    echo json_encode(['ok' => false, 'error' => 'データが正しくありません']);
+    exit;
 }
 
-$sessionId = substr(($payload['sessionId'] ?? ''), 0, 36);
-$playersCount = (int)($payload['playersCount'] ?? count($payload['results']));
-$stageNo = isset($payload['stageNo']) ? (int)$payload['stageNo'] : null; // ★追加
-$results = $payload['results'];
+$sessionId = $data['sessionId'] ?? 'unknown';
+$stageNo   = isset($data['stageNo']) ? (int)$data['stageNo'] : 1; // ステージ番号
+$results   = $data['results']; // 各プレイヤーの配列
 
 try {
-  $pdo = db();
-  $pdo->beginTransaction();
+    // プリペアドステートメントの準備
+    $sql = "INSERT INTO results (
+                session_id, 
+                player_name, 
+                player_color, 
+                turn_count, 
+                quiz_count, 
+                happening_count, 
+                stage_no, 
+                mode, 
+                created_at
+            ) VALUES (
+                :session_id, 
+                :player_name, 
+                :player_color, 
+                :turn_count, 
+                :quiz_count, 
+                :happening_count, 
+                :stage_no, 
+                'multi', 
+                NOW()
+            )";
+    
+    $stmt = $pdo->prepare($sql);
 
-  // ★ stage_no を INSERT に含める
-  $stmt = $pdo->prepare("
-    INSERT INTO results
-      (created_at, session_id, mode, players_count,
-       stage_no,
-       player_name, player_color, avatar_path,
-       turn_count, quiz_count, happening_count,
-       is_finished, finished_rank)
-    VALUES
-      (NOW(), :session_id, 'multi', :players_count,
-       :stage_no,
-       :name, :color, :path,
-       :turn, :quiz, :hap,
-       :is_finished, :finished_rank)
-  ");
+    // トランザクション開始（全員分を確実に保存するため）
+    $pdo->beginTransaction();
 
-  foreach ($results as $r) {
-    $name = mb_substr(trim($r['playerName'] ?? 'unknown'), 0, 50);
-    $color = $r['playerColor'] ?? null;
-    $path  = $r['avatarPath'] ?? null;
+    foreach ($results as $r) {
+        $stmt->execute([
+            ':session_id'      => $sessionId,
+            ':player_name'     => $r['playerName'],
+            ':player_color'    => $r['playerColor'] ?? '#999999',
+            ':turn_count'      => (int)$r['turn_count'],
+            ':quiz_count'      => (int)$r['quiz_count'],
+            ':happening_count' => (int)$r['happening_count'],
+            ':stage_no'        => $stageNo
+        ]);
+    }
 
-    $turn = (int)($r['turnCount'] ?? 0);
-    $quiz = (int)($r['quizCount'] ?? 0);
-    $hap  = (int)($r['happeningCount'] ?? 0);
-
-    $isFinished = !empty($r['isFinished']) ? 1 : 0;
-    $finishedRank = isset($r['finishedRank']) ? (int)$r['finishedRank'] : null;
-
-    $stmt->execute([
-      ':session_id' => $sessionId ?: null,
-      ':players_count' => $playersCount,
-      ':stage_no' => $stageNo,              // ★追加
-      ':name' => $name,
-      ':color' => $color,
-      ':path' => $path,
-      ':turn' => $turn,
-      ':quiz' => $quiz,
-      ':hap' => $hap,
-      ':is_finished' => $isFinished,
-      ':finished_rank' => $finishedRank
-    ]);
-  }
-
-  $pdo->commit();
-  echo json_encode(['ok' => true]);
+    $pdo->commit();
+    echo json_encode(['ok' => true]);
 
 } catch (Exception $e) {
-  if (isset($pdo) && $pdo->inTransaction()) $pdo->rollBack();
-  echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
 }
