@@ -206,5 +206,11 @@ h1{text-align:center;margin-bottom:16px}
 <?php endforeach; ?>
 
 </div>
+<div style="text-align:center; margin-top:30px;">
+  <button onclick="location.href='result_members.html'">
+    結果画面に戻る
+  </button>
+</div>
+<script src="../js/op_background_move.js"></script>
 </body>
 </html>
