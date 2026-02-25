@@ -156,10 +156,6 @@ h1{text-align:center;margin-bottom:16px}
 <div class="wrap">
 
 <h1>
-  <div style="background:#fff; color:red; padding:10px; border:1px solid red;">
-  現在のモード: <?= htmlspecialchars($view) ?><br>
-  現在のステージ番号: <?= htmlspecialchars($stage) ?>
-</div>
 <?php if ($view === 'stage'): ?>
   ステージ<?= $stage ?> ランキング
 <?php else: ?>
