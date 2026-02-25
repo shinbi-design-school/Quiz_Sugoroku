@@ -634,7 +634,7 @@ header p {
 }
 
 .quiz-option:hover {
-    background: #667eea;
+    background: #FCFF4C;
     color: white;
     transform: translateX(5px);
 }
