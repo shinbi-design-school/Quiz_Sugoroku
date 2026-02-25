@@ -779,18 +779,24 @@ function goToResult() {
     var s = playerStates[i];
     if (!s.isFinished) { rankCounter++; s.finishedRank = rankCounter; }
     return {
-      playerName:    p.name,
-      playerColor:   p.color,
-      avatarPath:    p.avatarPath || AVATAR_PATH,
-      turnCount:     s.turnCount,
-      quizCount:     s.quizCleared.length,
-      happeningCount:s.happeningCount,
-      isFinished:    s.isFinished,
-      finishedRank:  s.finishedRank,
+      playerName:      p.name,
+      playerColor:     p.color,
+      avatarPath:      p.avatarPath || AVATAR_PATH,
+      turn_count:      s.turnCount,
+      quiz_count:      s.quizCleared.length,
+      happening_count: s.happeningCount,
+      isFinished:      s.isFinished,
+      finishedRank:    s.finishedRank,
     };
   });
+
   localStorage.setItem('membersResults', JSON.stringify(results));
-  window.location.href = 'result_members.html?stage=4';
+
+  // 現在のURLからステージ番号を自動取得
+  const urlParams = new URLSearchParams(window.location.search);
+  const currentStage = urlParams.get('stage') || '4'; // デフォルトを2にする
+
+  window.location.href = 'result_members.html?stage=' + currentStage;
 }
 
 window.goToResult  = goToResult;
