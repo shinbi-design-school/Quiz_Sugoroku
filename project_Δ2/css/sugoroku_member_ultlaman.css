@@ -629,6 +629,7 @@ header p {
     width: 90%;
     max-width: 450px;
     text-align: center;
+    color:#000000;
 }
 
 #quizQuestion {
