@@ -393,7 +393,7 @@ header p {
 .modal.active { display: flex; }
 
 .modal-content {
-    background: #667eea;
+    background: #E0F6FF;
     padding: 30px;
     border-radius: 20px;
     width: 90%;
@@ -415,7 +415,7 @@ header p {
     padding: 15px !important;
     margin: 10px 0;
     border: 3px solid #667eea !important;
-    background: #ffffff;
+    background: #E0F6FF;
     border-radius: 15px;
     text-align: center;
     font-weight: bold;
@@ -447,6 +447,13 @@ header p {
     font-size: 2rem;
     font-weight: bold;
     color:#000000;
+}
+
+.dicemodaltitle {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
 }
 
 /* ==========================================
