@@ -160,7 +160,7 @@ function sendMembersResultsToServer(results) {
   };
 
   // 4. fetch実行
-  fetch('api/save_members_results.php', {
+  fetch('../api/save_members_results.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
