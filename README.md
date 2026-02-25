@@ -29,7 +29,7 @@
 
 | 項目 | 内容 |
 |------|------|
-| プロジェクト名 | コードの帆を上げろ QUIZ（クイズすごろくゲーム） |
+| プロジェクト名 | 雑学クイズすごろくゲーム |
 | チーム名 | 焚火ヴィジランテ |
 | プレイ人数 | 1人 ／ 2〜4人 |
 | ステージ数 | 4ステージ |
@@ -49,6 +49,9 @@ op.html（タイトル）
        │         ├─ sugoroku_ultlaman.html … ステージ3：ウルトラマンクイズ
        │         └─ world_origin.html    … ステージ4：せかいの首都クイズ
        │              └─ result.html（個人結果画面）
+       │                   ├─ [もう一度遊ぶ] → 直前のステージを再プレイ
+       │                   ├─ [ステージ選択] → stage_select.html
+       │                   └─ [ホームに戻る] → menu.html
        │
        └─ members_select.html（プレイヤー設定 / みんな）
             └─ stage_select.html（ステージ選択）
@@ -57,6 +60,9 @@ op.html（タイトル）
                  ├─ sugoroku_ultraman_member.html … ステージ3
                  └─ world_members.html         … ステージ4
                       └─ result_members.html（みんなの結果画面）
+                           ├─ [もう一度遊ぶ] → 直前のステージを再プレイ
+                           ├─ [ステージ選択] → stage_select.html
+                           └─ [ホームに戻る] → menu.html
 ```
 
 その他ページ：`site_howtouse.html`（遊び方）・`team.html`（作成者紹介）・`documents.html`（資料置き場）・`ranking.php`（ランキング）
@@ -69,7 +75,10 @@ op.html（タイトル）
 - **みんなであそぶ**：2〜4人のマルチプレイモード。ターン制で順番にサイコロを振って進行
 - **クイズマス**：止まるとクイズが出題。正解でそのまま進行、不正解で2マス戻る
 - **アクシデントマス**：止まると数マス戻される
-- **結果画面**：クリアターン数・クイズ正解数・アクシデント回数・総合評価（S/A/B/C/D）を表示
+- **結果画面**：持ち点・クリアターン数・クイズ正解数・アクシデント回数・総合評価（S/A/B/C/D）を表示
+- **持ち点方式のランク判定**：基本持ち点100点に対し、クイズ正解で加点、経過ターン数・アクシデント回数で減点し、最終持ち点でS〜Dランクを判定
+- **結果画面のボタン**：「もう一度遊ぶ」（直前ステージを同設定で再プレイ）・「ステージ選択」・「ホームに戻る」の3ボタン
+- **遊び方ページからゲームに戻る**：ゲームプレイ中に「遊び方」ボタンを押した場合、site_howtouse.html に「ゲームに戻る」ボタンが表示され、プレイ中のゲームに戻れる
 - **DB 保存**：みんなであそぶモードの結果を MySQL に保存
 - **ランキング**：保存された結果を元にランキング表示（`ranking.php`）
 - **ハンバーガーメニュー**：各画面共通のナビゲーション
@@ -79,11 +88,41 @@ op.html（タイトル）
 
 ---
 
+## ランク判定ロジック
+
+### 持ち点計算
+
+| 項目 | 計算 |
+|------|------|
+| 基本持ち点 | 100点 |
+| クイズ正解ボーナス | 1正解につき +1点 |
+| 経過ターン減点 | 経過ターン数ぶん減点 |
+| アクシデント減点 | 1回につき -1点 |
+
+**持ち点 = 100 + クイズ正解数 − 経過ターン数 − アクシデント回数**
+
+### ランク分け
+
+| ランク | 条件 |
+|--------|------|
+| S | 持ち点 85点以上 |
+| A | 持ち点 80〜84点 |
+| B | 持ち点 70〜79点 |
+| C | 持ち点 60〜69点 |
+| D | 持ち点 59点以下 |
+
+### 順位付け（みんなモード）
+
+ランク優先で S > A > B > C > D の順。同ランク内は持ち点が高い方が上位。
+
+---
+
 ## ディレクトリ構成
 
 ```
 project_Δ2/
 ├── index.html                  … エントリーポイント（プレイ人数選択）
+├── menu.html                   … ホーム画面（メニュー）
 ├── op.html                     … オープニング画面（タイトル）
 │
 ├── pages/                      … 各サブページ
@@ -100,7 +139,7 @@ project_Δ2/
 │   ├── world_members.html      … ステージ4（みんな）
 │   ├── result.html             … 結果画面（ひとり）
 │   ├── result_members.html     … 結果画面（みんな）
-│   ├── site_howtouse.html      … 遊び方ページ
+│   ├── site_howtouse.html      … 遊び方ページ（ゲーム中からの戻り機能付き）
 │   ├── team.html               … 作成者紹介ページ
 │   ├── documents.html          … 資料置き場ページ
 │   └── ranking.php             … ランキングページ（PHP）
@@ -117,7 +156,11 @@ project_Δ2/
 │   ├── quiz_mountain_style.css  … ステージ2用
 │   ├── quiz_mountain_multi_style.css … ステージ2（みんな）用
 │   ├── mountain_bg.css          … 山ステージ背景用
+│   ├── sugoroku_ultlaman_origin.css … ステージ3用
+│   ├── sugoroku_member_ultlaman.css … ステージ3（みんな）用
 │   ├── world_origin_style.css   … ステージ4用
+│   ├── world_members_style.css  … ステージ4（みんな）用
+│   ├── starnight.css            … 星空背景用
 │   ├── result.css               … 結果画面用
 │   ├── team.css                 … 作成者紹介ページ用
 │   └── ranking.css              … ランキングページ用
@@ -128,17 +171,18 @@ project_Δ2/
 │   ├── op_background_move.js    … オープニング背景アニメーション
 │   ├── background_move.js       … ゲーム画面背景アニメーション
 │   ├── mountain_bg.js           … 山ステージ背景アニメーション
+│   ├── starnight.js             … 星空背景アニメーション
 │   ├── character-selection.js   … キャラクター選択ロジック
-│   ├── sugoroku_origin_script.js … ステージ1ゲームロジック（ひとり）
-│   ├── sugoroku_members_script.js … ステージ1ゲームロジック（みんな）
-│   ├── quiz_mountain_script.js  … ステージ2ゲームロジック（ひとり）
-│   ├── quiz_mountain_members_script.js … ステージ2ゲームロジック（みんな）
-│   ├── sugoroku_ultraman.js     … ステージ3ゲームロジック（ひとり）
-│   ├── sugoroku_ultraman_members.js … ステージ3ゲームロジック（みんな）
-│   ├── world_origin_script.js   … ステージ4ゲームロジック（ひとり）
-│   ├── world_members.js         … ステージ4ゲームロジック（みんな）
-│   ├── result.js                … 結果画面ロジック（ひとり）
-│   ├── result_members.js        … 結果画面ロジック（みんな）
+│   ├── sugoroku_origin_script.js … ステージ1 ゲームロジック（ひとり）
+│   ├── sugoroku_members_script.js … ステージ1 ゲームロジック（みんな）
+│   ├── quiz_mountain_script.js  … ステージ2 ゲームロジック（ひとり）
+│   ├── quiz_mountain_members_script.js … ステージ2 ゲームロジック（みんな）
+│   ├── sugoroku_ultraman.js     … ステージ3 ゲームロジック（ひとり）
+│   ├── sugoroku_ultraman_members.js … ステージ3 ゲームロジック（みんな）
+│   ├── world_origin_script.js   … ステージ4 ゲームロジック（ひとり）
+│   ├── world_members.js         … ステージ4 ゲームロジック（みんな）
+│   ├── result.js                … ひとり用結果表示（持ち点方式ランク判定）
+│   ├── result_members.js        … みんな用結果表示（持ち点方式ランク判定・順位付け）・DB保存
 │   └── ranking.js               … ランキングページスクリプト
 │
 ├── api/                         … バックエンド API
@@ -153,6 +197,11 @@ project_Δ2/
 │   ├── suquare_goal.png         … すごろくゴール画像
 │   ├── quiz_mountain_start.png  … 山クイズスタート画像
 │   ├── quiz_mountain_goal.png   … 山クイズゴール画像
+│   ├── ultlaman.png             … ウルトラマン画像
+│   ├── ultlaman_start.png       … ウルトラマンスタート画像
+│   ├── ultlaman_goal.png        … ウルトラマンゴール画像
+│   ├── worldstart.jpg           … 世界ステージスタート画像
+│   ├── worldgoal.jpeg           … 世界ステージゴール画像
 │   ├── MicrosoftTeams-image.png … その他画像
 │   ├── daichaso 1.png           … メンバーアイコン
 │   ├── niwata.png               … メンバーアイコン
@@ -174,6 +223,7 @@ project_Δ2/
 |----------|------|------|
 | `op.html` | ルート | タイトル画面。「ゲームを始める」ボタンで index.html へ |
 | `index.html` | ルート | 「ひとりであそぶ」「みんなであそぶ」の選択画面 |
+| `menu.html` | ルート | ホーム画面（メニュー） |
 | `select.html` | pages/ | ひとり用キャラクター選択（名前・色・アバター） |
 | `members_select.html` | pages/ | みんな用プレイヤー設定（人数選択 → 各プレイヤー設定） |
 | `stage_select.html` | pages/ | 4つのステージから選択する画面 |
@@ -185,9 +235,9 @@ project_Δ2/
 | `quiz_mountain_members.html` | pages/ | ステージ2 みんな版 |
 | `sugoroku_ultraman_member.html` | pages/ | ステージ3 みんな版 |
 | `world_members.html` | pages/ | ステージ4 みんな版 |
-| `result.html` | pages/ | ひとり用結果画面（ターン数・正解数・評価表示） |
-| `result_members.html` | pages/ | みんな用結果画面（順位付きランキング表示） |
-| `site_howtouse.html` | pages/ | 遊び方の説明ページ |
+| `result.html` | pages/ | ひとり用結果画面（持ち点・ターン数・正解数・評価表示） |
+| `result_members.html` | pages/ | みんな用結果画面（順位付きランキング表示・持ち点表示） |
+| `site_howtouse.html` | pages/ | 遊び方の説明ページ（ゲーム中からの戻り機能付き） |
 | `team.html` | pages/ | 作成者紹介ページ |
 | `documents.html` | pages/ | 要件定義書等のプロジェクト資料へのリンクページ |
 | `ranking.php` | pages/ | DB から取得したスコアでランキングを表示 |
@@ -207,7 +257,11 @@ project_Δ2/
 | `quiz_mountain_style.css` | ステージ2（山登り盤面）のスタイル |
 | `quiz_mountain_multi_style.css` | ステージ2 みんな版のスタイル |
 | `mountain_bg.css` | 山ステージの背景グラデーション |
-| `world_origin_style.css` | ステージ4（世界地図盤面）のスタイル |
+| `sugoroku_ultlaman_origin.css` | ステージ3のスタイル |
+| `sugoroku_member_ultlaman.css` | ステージ3 みんな版のスタイル |
+| `world_origin_style.css` | ステージ4のスタイル |
+| `world_members_style.css` | ステージ4 みんな版のスタイル |
+| `starnight.css` | 星空背景用 |
 | `result.css` | 結果画面のスタイル |
 | `team.css` | 作成者紹介ページのスタイル |
 | `ranking.css` | ランキングページのスタイル |
@@ -221,17 +275,18 @@ project_Δ2/
 | `op_background_move.js` | 光ファイバー風 Canvas 背景アニメーション（オープニング系） |
 | `background_move.js` | 光ファイバー風 Canvas 背景アニメーション（ゲーム系） |
 | `mountain_bg.js` | 山ステージ専用の Canvas 背景アニメーション |
+| `starnight.js` | 星空背景アニメーション |
 | `character-selection.js` | キャラクター選択ロジック（名前入力・色選択・URL パラメータ渡し） |
-| `sugoroku_origin_script.js` | ステージ1 ゲームロジック（盤面生成・サイコロ・クイズ・ゴール判定） |
-| `sugoroku_members_script.js` | ステージ1 みんな版ゲームロジック |
-| `quiz_mountain_script.js` | ステージ2 ゲームロジック（山登り形式・49 マス） |
-| `quiz_mountain_members_script.js` | ステージ2 みんな版ゲームロジック |
-| `sugoroku_ultraman.js` | ステージ3 ゲームロジック |
-| `sugoroku_ultraman_members.js` | ステージ3 みんな版ゲームロジック |
-| `world_origin_script.js` | ステージ4 ゲームロジック |
-| `world_members.js` | ステージ4 みんな版ゲームロジック |
-| `result.js` | ひとり用結果表示（localStorage から取得・評価算出） |
-| `result_members.js` | みんな用結果表示・DB 保存（fetch API で `save_members_results.php` へ POST） |
+| `sugoroku_origin_script.js` | ステージ1 ゲームロジック（盤面生成・サイコロ・クイズ・ゴール判定）。結果に `stageUrl` を保存 |
+| `sugoroku_members_script.js` | ステージ1 みんな版ゲームロジック。結果に `membersStageUrl` を保存 |
+| `quiz_mountain_script.js` | ステージ2 ゲームロジック（山登り形式・49 マス）。結果に `stageUrl` を保存 |
+| `quiz_mountain_members_script.js` | ステージ2 みんな版ゲームロジック。結果に `membersStageUrl` を保存 |
+| `sugoroku_ultraman.js` | ステージ3 ゲームロジック。結果に `stageUrl` を保存 |
+| `sugoroku_ultraman_members.js` | ステージ3 みんな版ゲームロジック。結果に `membersStageUrl` を保存 |
+| `world_origin_script.js` | ステージ4 ゲームロジック。結果に `stageUrl` を保存 |
+| `world_members.js` | ステージ4 みんな版ゲームロジック。結果に `membersStageUrl` を保存 |
+| `result.js` | ひとり用結果表示（持ち点方式ランク判定：100 + クイズ正解 − ターン数 − アクシデント回数）。3ボタン：もう一度遊ぶ / ステージ選択 / ホームに戻る |
+| `result_members.js` | みんな用結果表示（持ち点方式ランク判定・S>A>B>C>D順位ソート）・DB保存。3ボタン：もう一度遊ぶ / ステージ選択 / ホームに戻る |
 | `ranking.js` | ランキングページのアニメーション処理 |
 
 ### API（PHP）
@@ -340,14 +395,14 @@ http://localhost/quiz_sugoroku/op.html
 4. **サイコロを振る** … ボタンをクリックしてサイコロを振り、出た目の数だけ進む
 5. **クイズに挑戦** … クイズマスに止まったら4択問題に回答（正解→進行 / 不正解→2マス戻る）
 6. **ゴールを目指す** … 最後のマスに到達でクリア！
-7. **結果を確認** … クリアターン数・正解数・アクシデント回数から S〜D の総合評価
+7. **結果を確認** … 持ち点（100 + クイズ正解 − ターン数 − アクシデント回数）から S〜D の総合評価
 
 ### ステージ一覧
 
 | # | ステージ名 | クイズ内容 |
 |---|-----------|-----------|
 | 1 | コードすごろく | HTML / CSS / JavaScript / PHP のプログラミング問題 |
-| 2 | 山の雑学クイズ | 日本百名山の標高・由来・地理に関する問題 |
+| 2 | 山の雑学クイズ | 日本の山の標高・由来・地理に関する問題 |
 | 3 | ウルトラマンクイズ | ウルトラマンシリーズに関する問題 |
 | 4 | せかいの首都クイズ | 世界各国の首都に関する問題 |
 
@@ -363,7 +418,7 @@ http://localhost/quiz_sugoroku/op.html
 | Web サーバー | Apache（XAMPP） |
 | フォント | Google Fonts（Kiwi Maru / Honk） |
 | アニメーション | Canvas API / CSS 3D Transform / CSS Keyframes |
-| データ受け渡し | localStorage / URL パラメータ / Fetch API（JSON） |
+| データ受け渡し | localStorage / sessionStorage / URL パラメータ / Fetch API（JSON） |
 
 ---
 
@@ -398,3 +453,4 @@ http://localhost/quiz_sugoroku/op.html
 
 このプロジェクトは学習目的で作成されたものです。  
 ライセンスについてはチームメンバーにお問い合わせください。
+
