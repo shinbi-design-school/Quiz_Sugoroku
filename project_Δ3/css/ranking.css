@@ -1,0 +1,80 @@
+/* ranking.css - ランキングページ用スタイル */
+
+.ranking-container {
+  max-width: 800px;
+  margin: 100px auto 60px;
+  padding: 20px;
+}
+
+.ranking-title {
+  font-size: 2.5rem;
+  text-align: center;
+  color: #fff;
+  margin-bottom: 30px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.ranking-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ranking-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.ranking-item:hover {
+  transform: translateY(-2px);
+}
+
+.ranking-item.rank-1 {
+  background: linear-gradient(135deg, #fff9c4, #fff176);
+  box-shadow: 0 4px 16px rgba(255, 215, 0, 0.3);
+}
+
+.ranking-item.rank-2 {
+  background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+  box-shadow: 0 4px 16px rgba(192, 192, 192, 0.3);
+}
+
+.ranking-item.rank-3 {
+  background: linear-gradient(135deg, #ffe0b2, #ffcc80);
+  box-shadow: 0 4px 16px rgba(205, 127, 50, 0.3);
+}
+
+.ranking-position {
+  font-size: 1.8rem;
+  font-weight: bold;
+  min-width: 50px;
+  text-align: center;
+  color: #667eea;
+}
+
+.ranking-player-name {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #333;
+  flex: 1;
+}
+
+.ranking-score {
+  font-size: 1.1rem;
+  color: #666;
+  text-align: right;
+}
+
+.ranking-empty {
+  text-align: center;
+  padding: 40px;
+  color: #fff;
+  font-size: 1.3rem;
+}

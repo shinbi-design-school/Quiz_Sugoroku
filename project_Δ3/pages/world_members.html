@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>世界の首都クイズ</title>
+    <link rel="icon" type="image/png" href="../images/pechi.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Honk:MORF,SHLN@14,35.7&family=Kiwi+Maru&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/reset.css" />
+    <link rel="stylesheet" href="../css/background_move.css" />
+    <link rel="stylesheet" href="../css/world_members_style.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+      /* 順番決めポップアップ */
+      .order-popup {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(0, 0, 0, 0.85);
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.4s ease-out;
+      }
+      .order-popup.show {
+        display: flex;
+      }
+      .order-popup-content {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 48px 40px;
+        border-radius: 30px;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        animation: popupSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        max-width: 500px;
+      }
+      .order-popup-icon {
+        font-size: 5rem;
+        margin-bottom: 20px;
+        animation: iconBounce 1s ease-in-out infinite;
+      }
+      .order-popup-title {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #fcff4c;
+        margin-bottom: 16px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      }
+      .order-popup-text {
+        font-size: 1.2rem;
+        color: white;
+        margin-bottom: 32px;
+        line-height: 1.8;
+      }
+      .order-popup-btn {
+        padding: 16px 60px;
+        font-size: 1.3rem;
+        font-weight: bold;
+        background: #fcff4c;
+        color: #22173b;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 6px 20px rgba(252, 255, 76, 0.4);
+        transition: all 0.3s ease;
+      }
+      .order-popup-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(252, 255, 76, 0.6);
+      }
+      .order-popup-btn:active {
+        transform: translateY(0);
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes popupSlideIn {
+        from {
+          opacity: 0;
+          transform: scale(0.8) translateY(-30px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      @keyframes iconBounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="fiber"></canvas>
+
+    <!-- 順番決め開始ポップアップ -->
+    <div id="orderStartPopup" class="order-popup">
+      <div class="order-popup-content">
+        <div class="order-popup-icon">🎲</div>
+        <h2 class="order-popup-title">まずは順番決めを開始！</h2>
+        <p class="order-popup-text">
+          サイコロを振って<br />プレイ順を決めましょう
+        </p>
+        <button id="btnOrderStart" class="order-popup-btn">開始する</button>
+      </div>
+    </div>
+
+    <!-- ターン切り替えオーバーレイ -->
+    <div id="turnOverlay">
+      <p class="ov-title" id="ovTitle">つぎのプレイヤー</p>
+      <svg
+        id="ovAvatar"
+        width="100"
+        height="115"
+        viewBox="0 0 120 140"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          id="ovAvatarBody"
+          d="M 60 140 L 40 120 L 35 120 L 45 80 A 40 40 0 1 1 75 80 L 85 120 L 80 120 Z"
+          fill="#00BFFF"
+        />
+        <circle cx="50" cy="45" r="12" fill="white" opacity="0.3" />
+      </svg>
+      <p class="ov-name" id="ovName">プレイヤー</p>
+      <p class="ov-sub" id="ovSubText">の番です！</p>
+      <button id="btnTurnStart">スタート！</button>
+    </div>
+
+    <!-- 現在プレイヤーバナー -->
+    <div id="currentPlayerBanner">
+      <svg
+        class="banner-avatar"
+        id="bannerAvatar"
+        viewBox="0 0 120 140"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          id="bannerAvatarBody"
+          d="M 60 140 L 40 120 L 35 120 L 45 80 A 40 40 0 1 1 75 80 L 85 120 L 80 120 Z"
+          fill="#00BFFF"
+        />
+      </svg>
+      <span class="banner-label">プレイヤー：</span>
+      <span class="banner-name" id="bannerName">---</span>
+      <span class="banner-turn" id="bannerTurnInfo"></span>
+    </div>
+
+    <!-- プレイヤーリスト -->
+    <div id="playersList"></div>
+
+    <header>
+      <div class="header">
+        <h1>✈ 世界の首都クイズ ✈</h1>
+        <p>世界の首都を知り、旅を楽しもう！</p>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="game-area">
+        <div class="info-panel">
+          <div class="info-card">
+            <div class="label">現在地</div>
+            <div class="value" id="current-position">0</div>
+          </div>
+          <div class="info-card">
+            <div class="label">ターン数</div>
+            <div class="value" id="turn-count">0</div>
+          </div>
+          <div class="info-card">
+            <div class="label">クイズ正解数</div>
+            <div class="value"><span id="quiz-count">0</span></div>
+          </div>
+        </div>
+
+        <div id="message-area"></div>
+
+        <div class="board-wrapper">
+          <div class="board" id="board">
+            <svg
+              id="board-lines"
+              style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 0;
+              "
+            ></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- クイズモーダル -->
+    <div
+      class="modal"
+      id="quizModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="quizModalTitle"
+    >
+      <div class="modal-content">
+        <div class="modal-icon" aria-hidden="true">✈️</div>
+        <div class="modal-title" id="quizModalTitle">世界の首都クイズ</div>
+        <div class="quiz-question" id="quizQuestion"></div>
+        <div class="quiz-options" id="quizOptions"></div>
+      </div>
+    </div>
+
+    <!-- イベントモーダル -->
+    <div class="modal" id="eventModal">
+      <div class="modal-content">
+        <div class="modal-icon" id="eventIcon"></div>
+        <div class="modal-title" id="eventTitle"></div>
+        <div class="modal-message" id="eventMessage"></div>
+        <button class="btn btn-primary" onclick="closeEventModal()">OK</button>
+      </div>
+    </div>
+
+    <!-- ゴールモーダル（1人ゴール時） -->
+    <div class="modal" id="goalModal">
+      <div class="modal-content">
+        <div class="modal-icon">🎉</div>
+        <div class="modal-title">頂上到達！</div>
+        <div class="modal-message" id="goalMessage"></div>
+        <div
+          style="
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+          "
+        >
+          <button
+            class="btn btn-primary"
+            id="btnAfterGoal"
+            onclick="afterPlayerGoal()"
+          >
+            次のプレイヤーへ
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 全員終了モーダル -->
+    <div class="modal" id="allDoneModal">
+      <div class="modal-content">
+        <div class="modal-icon">🏆</div>
+        <div class="modal-title">おつかれさまでした！</div>
+        <div class="modal-message">結果を確認しましょう！</div>
+        <div
+          style="
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+          "
+        >
+          <button class="btn btn-primary" onclick="goToResult()">
+            結果を見る
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ダイスモーダル -->
+    <div
+      class="modal"
+      id="diceModal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      aria-labelledby="diceModalTitle"
+    >
+      <div class="modal-content dice-modal-content" tabindex="-1">
+        <h2
+          id="diceModalTitle"
+          style="
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #333;
+          "
+        >
+          何が出るかな？
+        </h2>
+        <div class="dice-container">
+          <div class="dice" id="dice">
+            <div class="dice-face face-1"><div class="dot"></div></div>
+            <div class="dice-face face-2">
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+            <div class="dice-face face-3">
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+            <div class="dice-face face-4">
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+            <div class="dice-face face-5">
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+            <div class="dice-face face-6">
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dice-section">
+      <button class="btn btn-primary" id="rollBtn" type="button">
+        サイコロを振る
+      </button>
+    </div>
+
+    <div
+      class="button-container"
+      style="text-align: center; margin: 40px 0; padding-bottom: 100px"
+    >
+      <button class="choice-button" onclick="location.href = '../index.html'">
+        ホームへ戻る
+      </button>
+      <button
+        class="choice-button"
+        onclick="location.href = 'stage_select.html'"
+      >
+        ステージ選択へ
+      </button>
+      <button
+        class="choice-button"
+        onclick="sessionStorage.setItem('gameReturnUrl', location.href); location.href = 'site_howtouse.html'"
+      >
+        遊び方
+      </button>
+    </div>
+
+    <footer></footer>
+    <script src="../js/world_members.js"></script>
+  </body>
+</html>

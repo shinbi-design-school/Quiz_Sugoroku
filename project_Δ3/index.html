@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>コードの帆を上げろQUIZ</title>
+    <link rel="icon" type="image/png" href="images/pechi.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Honk:MORF@15&family=Kiwi+Maru&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/op_background_move.css" />
+    <link rel="stylesheet" href="css/op_style.css" />
+    <style>
+      h1,
+      p {
+        font-family: "Kiwi Maru", serif;
+      }
+
+      .op-main-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 40px 20px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .op-logo-container {
+        width: 90%;
+        max-width: 900px;
+        aspect-ratio: 16 / 9;
+        background-color: rgba(128, 128, 128, 0.3);
+        background-image: none; /* 後で画像追加可能 */
+        background-size: cover;
+        background-position: center;
+        border-radius: 30px;
+        backdrop-filter: blur(10px);
+        border: 3px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 80px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .op-logo-container::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(102, 126, 234, 0.1),
+          rgba(118, 75, 162, 0.1)
+        );
+        animation: shimmer 3s ease-in-out infinite;
+      }
+
+      @keyframes shimmer {
+        0%,
+        100% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 0.6;
+        }
+      }
+
+      .op-title {
+        font-size: clamp(2.5rem, 6vw, 5rem);
+        color: #fcff4c;
+        text-shadow:
+          0 0 30px rgba(252, 255, 76, 1),
+          0 0 60px rgba(252, 255, 76, 0.6),
+          0 6px 20px rgba(0, 0, 0, 0.8);
+        text-align: center;
+        font-weight: bold;
+        z-index: 1;
+        animation: titlePulse 2.5s ease-in-out infinite;
+        padding: 0 20px;
+      }
+
+      @keyframes titlePulse {
+        0%,
+        100% {
+          transform: scale(1);
+          text-shadow:
+            0 0 30px rgba(252, 255, 76, 0.8),
+            0 0 60px rgba(252, 255, 76, 0.4),
+            0 6px 20px rgba(0, 0, 0, 0.8);
+        }
+        50% {
+          transform: scale(1.05);
+          text-shadow:
+            0 0 40px rgba(252, 255, 76, 1),
+            0 0 80px rgba(252, 255, 76, 0.8),
+            0 6px 25px rgba(0, 0, 0, 0.9);
+        }
+      }
+
+      .op-start-btn {
+        padding: 25px 90px;
+        font-size: 2rem;
+        font-weight: bold;
+        font-family: "Kiwi Maru", serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 60px;
+        cursor: pointer;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.6);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .op-start-btn::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.4);
+        transform: translate(-50%, -50%);
+        transition:
+          width 0.8s,
+          height 0.8s;
+      }
+
+      .op-start-btn:hover {
+        transform: translateY(-8px) scale(1.05);
+        box-shadow: 0 15px 50px rgba(102, 126, 234, 0.8);
+      }
+
+      .op-start-btn:hover::before {
+        width: 400px;
+        height: 400px;
+      }
+
+      .op-start-btn:active {
+        transform: translateY(-3px) scale(1.02);
+      }
+
+      @media (max-width: 768px) {
+        .op-logo-container {
+          width: 95%;
+          margin-bottom: 60px;
+        }
+
+        .op-start-btn {
+          padding: 20px 70px;
+          font-size: 1.6rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="fiber"></canvas>
+
+    <!-- ヘッダー -->
+    <header class="header">
+      <div class="header-content">
+        <div class="header-left">
+          <span class="header-title">
+            <a href="index.html">
+              <img class="header-img" src="images/takibi_logo.png" alt="" />
+            </a>
+          </span>
+        </div>
+
+        <!-- ハンバーガーメニューボタン -->
+        <button class="hamburger" id="hamburger" aria-label="メニュー">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ハンバーガーメニュー（オーバーレイ） -->
+    <nav class="menu-overlay" id="menuOverlay">
+      <div class="menu-content">
+        <button class="menu-close" id="menuClose" aria-label="閉じる">
+          &times;
+        </button>
+        <ul class="menu-list">
+          <li><a href="index.html" class="menu-item">ホーム</a></li>
+          <li>
+            <a href="pages/site_howtouse.html" class="menu-item">遊び方</a>
+          </li>
+          <!-- <li> -->
+          <!-- <a href="pages/site_ranking.php" class="menu-item">ランキング</a> -->
+          <!-- </li> -->
+          <li><a href="pages/team.html" class="menu-item">作成者</a></li>
+          <li><a href="pages/documents.html" class="menu-item">資料</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="op-main-container">
+      <div class="op-logo-container">
+        <h1 class="op-title">クイズすごろくゲーム</h1>
+      </div>
+
+      <button class="op-start-btn" onclick="location.href = 'menu.html'">
+        ゲームを始める
+      </button>
+    </main>
+
+    <script src="js/op_script.js"></script>
+    <script src="js/op_background_move.js"></script>
+  </body>
+</html>

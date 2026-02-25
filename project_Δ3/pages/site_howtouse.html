@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>遊び方 - 焚火ヴィジランテ</title>
+    <link rel="icon" type="image/png" href="../images/pechi.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Honk:MORF,SHLN@14,35.7&family=Kiwi+Maru&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/reset.css" />
+    <link rel="stylesheet" href="../css/op_background_move.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <canvas id="fiber"></canvas>
+    <!-- ヘッダー -->
+    <header class="header">
+      <div class="header-content">
+        <div class="header-left">
+          <span class="header-title">
+            <a href="../index.html">
+              <img class="header-img" src="../images/takibi_logo.png" alt="" />
+            </a>
+          </span>
+        </div>
+
+        <!-- ハンバーガーメニューボタン -->
+        <button class="hamburger" id="hamburger" aria-label="メニュー">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ハンバーガーメニュー（オーバーレイ） -->
+    <nav class="menu-overlay" id="menuOverlay">
+      <div class="menu-content">
+        <button class="menu-close" id="menuClose" aria-label="閉じる">
+          &times;
+        </button>
+        <ul class="menu-list">
+          <li><a href="../index.html" class="menu-item">ホーム</a></li>
+          <li>
+            <a href="site_howtouse.html" class="menu-item">遊び方</a>
+          </li>
+          <!-- <li> -->
+          <!-- <a href="site_ranking.php" class="menu-item">ランキング</a> -->
+          <!-- </li> -->
+          <li><a href="team.html" class="menu-item">作成者</a></li>
+          <li><a href="documents.html" class="menu-item">資料</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <main class="main-container">
+      <div class="title-area">
+        <h1 class="game-title" style="font-size: 3.5rem">⚀ 遊び方 ⚀</h1>
+      </div>
+
+      <!-- 遊び方の説明 -->
+      <div
+        class="how-to-play-section"
+        style="max-width: 800px; margin: 0 auto; padding: 40px 20px"
+      >
+        <!-- ゲーム概要 -->
+        <div
+          class="section-card"
+          style="
+            background: rgba(255, 255, 255, 0.95);
+            padding: 35px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+          "
+        >
+          <h2
+            style="
+              color: #000 !important;
+              font-size: 2.2rem;
+              margin-bottom: 25px;
+              text-align: center;
+              font-weight: bold;
+            "
+          >
+            🎯 ゲーム概要
+          </h2>
+          <p
+            style="
+              font-size: 1.3rem;
+              line-height: 2;
+              text-align: center;
+              color: #333;
+              font-weight: 500;
+            "
+          >
+            様々な知識を駆使して、スタートからゴールを目指す双六ゲームです！<br />
+            クイズに正解して、ゴールまでの道のりを進みましょう。
+          </p>
+        </div>
+
+        <!-- 基本ルール -->
+        <div
+          class="section-card"
+          style="
+            background: rgba(255, 255, 255, 0.95);
+            padding: 35px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+          "
+        >
+          <h2
+            style="
+              color: #000 !important;
+              font-size: 2.2rem;
+              margin-bottom: 25px;
+              text-align: center;
+              font-weight: bold;
+            "
+          >
+            📋 基本ルール
+          </h2>
+          <ol
+            style="
+              font-size: 1.2rem;
+              line-height: 2.2;
+              padding-left: 30px;
+              color: #333;
+            "
+          >
+            <li>
+              <strong>プレイヤー設定:</strong> 名前とアバターの色を選択します
+            </li>
+            <li>
+              <strong>サイコロを振る:</strong>
+              ボタンをクリックしてサイコロを振ります
+            </li>
+            <li><strong>マス目を進む:</strong> 出た目の数だけマスを進みます</li>
+            <li>
+              <strong>クイズに挑戦:</strong>
+              各マスで出題される問題に答えます
+            </li>
+            <li>
+              <strong>ゴール:</strong> 最後のマスに到達したらゲームクリア！
+            </li>
+          </ol>
+        </div>
+
+        <!-- マスの種類 -->
+        <div
+          class="section-card"
+          style="
+            background: rgba(255, 255, 255, 0.95);
+            padding: 35px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+          "
+        >
+          <h2
+            style="
+              color: #000 !important;
+              font-size: 2.2rem;
+              margin-bottom: 25px;
+              text-align: center;
+              font-weight: bold;
+            "
+          >
+            🎲 マスの種類
+          </h2>
+          <div style="display: grid; gap: 20px">
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                padding: 20px;
+                background: rgba(240, 244, 255, 0.9);
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              "
+            >
+              <span style="font-size: 2.5rem">❓</span>
+              <div>
+                <strong
+                  style="
+                    font-size: 1.3rem;
+                    color: #667eea;
+                    display: block;
+                    margin-bottom: 8px;
+                  "
+                  >クイズマス</strong
+                >
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 1.1rem;
+                    line-height: 1.6;
+                    color: #333;
+                  "
+                >
+                  それぞれのテーマにあった問題が出題されます。正解すると先に進めます！
+                </p>
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                padding: 20px;
+                background: rgba(255, 230, 230, 0.9);
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              "
+            >
+              <span style="font-size: 2.5rem">💥</span>
+              <div>
+                <strong
+                  style="
+                    font-size: 1.3rem;
+                    color: #e74c3c;
+                    display: block;
+                    margin-bottom: 8px;
+                  "
+                  >アクシデントマス</strong
+                >
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 1.1rem;
+                    line-height: 1.6;
+                    color: #333;
+                  "
+                >
+                  アクシデント発生！数マス戻ってしまいます。
+                </p>
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                padding: 20px;
+                background: rgba(232, 245, 233, 0.9);
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              "
+            >
+              <span style="font-size: 2.5rem">🎉</span>
+              <div>
+                <strong
+                  style="
+                    font-size: 1.3rem;
+                    color: #27ae60;
+                    display: block;
+                    margin-bottom: 8px;
+                  "
+                  >ゴール</strong
+                >
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 1.1rem;
+                    line-height: 1.6;
+                    color: #333;
+                  "
+                >
+                  おめでとうございます！結果画面で成績を確認できます。
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- クイズについて -->
+        <div
+          class="section-card"
+          style="
+            background: rgba(255, 255, 255, 0.95);
+            padding: 35px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+          "
+        >
+          <h2
+            style="
+              color: #000 !important;
+              font-size: 2.2rem;
+              margin-bottom: 25px;
+              text-align: center;
+              font-weight: bold;
+            "
+          >
+            💡 クイズについて
+          </h2>
+          <ul
+            style="
+              font-size: 1.2rem;
+              line-height: 2.2;
+              padding-left: 30px;
+              color: #333;
+            "
+          >
+            <li>
+              テーマは4つ！<br />コード、山、ウルトラマン、国の首都に関する問題が出題されます
+            </li>
+            <li>4択の選択肢から正しい答えを選びます</li>
+            <li><strong>正解:</strong> そのまま進めます</li>
+            <li><strong>不正解:</strong> 数マス戻ります</li>
+            <li>正解したクイズマスでは問題は出題されません</li>
+          </ul>
+        </div>
+
+        <!-- 結果画面 -->
+        <div
+          class="section-card"
+          style="
+            background: rgba(255, 255, 255, 0.95);
+            padding: 35px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+          "
+        >
+          <h2
+            style="
+              color: #000 !important;
+              font-size: 2.2rem;
+              margin-bottom: 25px;
+              text-align: center;
+              font-weight: bold;
+            "
+          >
+            🏆 結果画面
+          </h2>
+          <p
+            style="
+              font-size: 1.2rem;
+              line-height: 2;
+              margin-bottom: 20px;
+              color: #333;
+              font-weight: 500;
+            "
+          >
+            ゴールすると、以下の情報が表示されます：
+          </p>
+          <ul
+            style="
+              font-size: 1.2rem;
+              line-height: 2.2;
+              padding-left: 30px;
+              color: #333;
+            "
+          >
+            <li>
+              <strong>クリアターン数:</strong> ゴールまでにかかったターン数
+            </li>
+            <li><strong>クイズ正解数:</strong> 正解したクイズの数</li>
+            <li>
+              <strong>アクシデント回数:</strong> アクシデントマスを踏んだ回数
+            </li>
+            <li><strong>総合評価:</strong> S/A/B/C/Dランクで評価</li>
+          </ul>
+        </div>
+
+        <!-- Tips -->
+        <div
+          class="section-card"
+          style="
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 35px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+          "
+        >
+          <h2
+            style="
+              font-size: 2.2rem;
+              margin-bottom: 25px;
+              text-align: center;
+              font-weight: bold;
+            "
+          >
+            ✨ 高評価を目指すコツ
+          </h2>
+          <ul style="font-size: 1.2rem; line-height: 2.2; padding-left: 30px">
+            <li>1.クイズに全問正解を目指しましょう</li>
+            <li>2.できるだけ少ないターン数でゴールを目指しましょう</li>
+            <li>3.アクシデントマスを避けるのも運次第！</li>
+            <li>
+              4.クイズ正解でポイントが加点・ターン経過とアクシデントで減点されます
+            </li>
+            <li>
+              5.Sランクを目指すには少ないターン数かつクイズに正解しましょう
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ホームに戻るボタン -->
+      <div class="button-container" style="text-align: center; margin: 40px 0">
+        <button
+          class="choice-button"
+          id="btnBackToGame"
+          style="display: none"
+          onclick="goBackToGame()"
+        >
+          ゲームに戻る
+        </button>
+        <button class="choice-button" onclick="location.href = '../index.html'">
+          ホームへ戻る
+        </button>
+      </div>
+    </main>
+
+    <script src="../js/script.js"></script>
+    <script src="../js/op_background_move.js"></script>
+    <script>
+      // ゲーム画面から遷移してきた場合は「ゲームに戻る」ボタンを表示
+      (function () {
+        var returnUrl = sessionStorage.getItem("gameReturnUrl");
+        if (returnUrl) {
+          document.getElementById("btnBackToGame").style.display = "";
+        }
+      })();
+
+      function goBackToGame() {
+        var returnUrl = sessionStorage.getItem("gameReturnUrl");
+        if (returnUrl) {
+          sessionStorage.removeItem("gameReturnUrl");
+          location.href = returnUrl;
+        }
+      }
+    </script>
+  </body>
+</html>
