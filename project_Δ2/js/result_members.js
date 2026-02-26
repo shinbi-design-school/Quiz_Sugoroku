@@ -125,7 +125,7 @@ function playAgain() {
     localStorage.removeItem('membersResults');
     localStorage.removeItem('membersPlayers');
     localStorage.removeItem('membersCurrentTurn');
-    window.location.href = 'members_select.html';
+    window.location.href = 'sugoroku_members.html';
 }
 
 function goToHome() {
