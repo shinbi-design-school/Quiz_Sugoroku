@@ -69,7 +69,10 @@ function calcSortKey(r) {
         // 未ゴールは最下位扱い
         return { gradeIdx: 999, points: -9999 };
     }
-    const { grade, points } = calcGrade(r.turnCount, r.quizCount, r.happeningCount);
+    const tc = r.turnCount      !== undefined ? r.turnCount      : r.turn_count;
+    const qc = r.quizCount      !== undefined ? r.quizCount      : r.quiz_count;
+    const hc = r.happeningCount !== undefined ? r.happeningCount : r.happening_count;
+    const { grade, points } = calcGrade(tc, qc, hc);
     const gradeIdx = GRADE_ORDER[grade] !== undefined ? GRADE_ORDER[grade] : 999;
     return { gradeIdx, points };
 }
@@ -103,9 +106,10 @@ function displayRanking() {
     list.innerHTML = '';
 
     results.forEach((r, i) => {
-        const tc = toSafeInt(r.turnCount);
-        const qc = toSafeInt(r.quizCount);
-        const hc = toSafeInt(r.happeningCount);
+        // camelCase / snake_case 両方に対応（互換性確保）
+        const tc = toSafeInt(r.turnCount      !== undefined ? r.turnCount      : r.turn_count);
+        const qc = toSafeInt(r.quizCount      !== undefined ? r.quizCount      : r.quiz_count);
+        const hc = toSafeInt(r.happeningCount !== undefined ? r.happeningCount : r.happening_count);
         const { grade, comment } = calcGrade(tc, qc, hc);
         const rankClass = i < 3 ? `rank-${i + 1}` : 'rank-other';
         const badge     = i < 3 ? RANK_MEDALS[i] : `${i + 1}位`;

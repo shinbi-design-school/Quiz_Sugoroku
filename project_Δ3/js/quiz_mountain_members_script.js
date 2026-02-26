@@ -65,7 +65,7 @@ const quizData = {
   4:  { question: '金峰山の山頂にある巨岩の名前は？', options: ['三丈岩', '天狗岩', '五丈岩', '大岩'], answer: 2, explanation: '山頂には高さ約15mの五丈岩がそびえています！' },
   5:  { question: '瑞牆山（みずがきやま）の特徴は？', options: ['湿地帯', '花崗岩の岩峰', '火山', '草原'], answer: 1, explanation: '花崗岩の巨岩が立ち並ぶ独特の山容です！' },
   6:  { question: '大菩薩嶺で有名な文学作品は？', options: ['雪国', '大菩薩峠', '伊豆の踊子', '山の音'], answer: 1, explanation: '中里介山の長編小説「大菩薩峠」の舞台です！' },
-  7:  { question: '雲取山は東京都の最高峰ですが、標高は何m？', options: ['2014m', '2015m', '2016m', '2017m'], answer: 3, explanation: '雲取山は標高2017mで東京都最高峰です！' },
+  7:  { question: '雲取山は東京都の最高峰ですが、標高は何m？', options: ['1500m', '2000m', '2500m', '2017m'], answer: 3, explanation: '雲取山は標高2017mで東京都最高峰です！' },
   8:  { question: '両神山の名前の由来とされる神様は？', options: ['天照大神・月読命', 'イザナギ・イザナミ', '素戔嗚尊・大国主命', '大山祇命・木花咲耶姫'], answer: 1, explanation: '両神とはイザナギ・イザナミの二神とされます！' },
   9:  { question: '草津白根山の湯釜の特徴は？', options: ['滝がある', '氷河がある', 'エメラルドグリーンの火口湖', '温泉が湧く'], answer: 2, explanation: '世界有数の酸性度を誇るエメラルドグリーンの火口湖です！' },
   10: { question: '浅間山は何火山に分類される？', options: ['死火山', '活火山', '休火山', '泥火山'], answer: 1, explanation: '浅間山は現在も活発な活火山です！' },
@@ -89,7 +89,7 @@ const quizData = {
   28: { question: '鹿島槍ヶ岳の特徴的な山容は？', options: ['台形', '双耳峰', 'ドーム型', '三角錐'], answer: 1, explanation: '南峰と北峰からなる双耳峰が特徴です！' },
   29: { question: '剱岳に初登頂したのは？', options: ['僧侶', '陸軍測量隊', '猟師', '登山家'], answer: 1, explanation: '1907年に陸軍参謀本部陸地測量部が初登頂しました！' },
   30: { question: '立山の「地獄谷」で見られる現象は？', options: ['氷河', '噴気・硫黄', '温泉', '滝'], answer: 1, explanation: '火山ガスが噴出し、硫黄の結晶が見られます！' },
-  31: { question: '槍ヶ岳の標高は？', options: ['3160m', '3170m', '3180m', '3190m'], answer: 2, explanation: '槍ヶ岳の標高は3180mで日本第5位です！' },
+  31: { question: '槍ヶ岳の標高は？', options: ['3200m', '3100m', '3180m', '3190m'], answer: 2, explanation: '槍ヶ岳の標高は3180mで日本第5位です！' },
   32: { question: '穂高岳の最高峰は？', options: ['西穂高岳', '北穂高岳', '奥穂高岳', '前穂高岳'], answer: 2, explanation: '奥穂高岳（3190m）が穂高連峰の最高峰です！' },
   33: { question: '甲斐駒ヶ岳の山頂の特徴は？', options: ['緑の岩', '赤い岩', '白い花崗岩', '黒い岩'], answer: 2, explanation: '山頂は白い花崗岩で覆われ、神々しい姿です！' },
   34: { question: '仙丈ヶ岳の別名は？', options: ['南アルプスの王', '南アルプスの女王', '南アルプスの姫', '南アルプスの貴公子'], answer: 1, explanation: 'たおやかな山容から「南アルプスの女王」と呼ばれます！' },
@@ -99,7 +99,7 @@ const quizData = {
   38: { question: '赤石岳の名前の由来は？', options: ['夕日で赤く見える', '赤い岩石（輝緑凝灰岩）', '赤石という人物', '赤い植物'], answer: 1, explanation: '山腹に見られる赤い岩石（ラジオラリア）が由来です！' },
   39: { question: '聖岳は何アルプスの最南端の3000m峰？', options: ['中央アルプス', '八ヶ岳', '南アルプス', '北アルプス'], answer: 2, explanation: '聖岳（3013m）は南アルプス最南端の3000m峰です！' },
   40: { question: '北岳は日本で何番目に高い山？', options: ['1位', '3位', '2位', '4位'], answer: 2, explanation: '北岳は標高3193mで日本第2位の高峰です！' },
-  41: { question: '富士山の標高は何m？', options: ['3774m', '3775m', '3776m', '3777m'], answer: 2, explanation: '富士山の標高は3776mで日本最高峰です！' },
+  41: { question: '富士山の標高は何m？', options: ['3775m', '3777m', '3776m', '3774m'], answer: 2, explanation: '富士山の標高は3776mで日本最高峰です！' },
 };
 
 
@@ -768,9 +768,9 @@ function goToResult() {
       playerName:      p.name,
       playerColor:     p.color,
       avatarPath:      p.avatarPath || AVATAR_PATH,
-      turn_count:      s.turnCount,
-      quiz_count:      s.quizCleared.length,
-      happening_count: s.happeningCount,
+      turnCount:       s.turnCount,
+      quizCount:       s.quizCleared.length,
+      happeningCount:  s.happeningCount,
       isFinished:      s.isFinished,
       finishedRank:    s.finishedRank,
     };

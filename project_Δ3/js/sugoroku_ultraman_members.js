@@ -1037,9 +1037,9 @@ function goToResult() {
       playerName:      p.name,
       playerColor:     p.color,
       avatarPath:      p.avatarPath || AVATAR_PATH,
-      turn_count:      s.turnCount,
-      quiz_count:      s.quizCleared.length,
-      happening_count: s.happeningCount,
+      turnCount:       s.turnCount,
+      quizCount:       s.quizCleared.length,
+      happeningCount:  s.happeningCount,
       isFinished:      s.isFinished,
       finishedRank:    s.finishedRank,
     };
