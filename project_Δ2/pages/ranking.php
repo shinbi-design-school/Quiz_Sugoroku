@@ -203,14 +203,13 @@ h1{text-align:center;margin-bottom:16px}
       <?php endif; ?>
     </div>
   </div>
-<?php endforeach; ?>
+  <?php endforeach; ?>
 
 </div>
-<div style="text-align:center; margin-top:30px;">
-  <button onclick="location.href='result_members.html'">
-    結果画面に戻る
-  </button>
-</div>
-<script src="../js/op_background_move.js"></script>
+  <div class="btn-area">
+    <button class="btn-back" onclick="location.href='result_members.php'">
+      ← 結果画面に戻る
+    </button>
+  </div>
 </body>
 </html>

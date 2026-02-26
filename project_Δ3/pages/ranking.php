@@ -78,6 +78,7 @@ if ($view === 'stage') {
 <head>
 <meta charset="utf-8">
 <title>ランキング</title>
+<link rel="stylesheet" href="../css/op_background_move.css" />
 <style>
 body{
   font-family: system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -149,10 +150,40 @@ h1{text-align:center;margin-bottom:16px}
 .top1{border:2px solid #f5c542}
 .top2{border:2px solid #c0c0c0}
 .top3{border:2px solid #cd7f32}
+
+
+.btn-area {
+    text-align: center;
+    margin: 40px 0 20px;
+}
+
+.btn-back {
+    padding: 14px 40px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+.btn-back:active {
+    transform: translateY(0);
+}
+
 </style>
 </head>
 
 <body>
+<canvas id="fiber"></canvas>  
 <div class="wrap">
 
 <h1>
@@ -203,13 +234,13 @@ h1{text-align:center;margin-bottom:16px}
       <?php endif; ?>
     </div>
   </div>
-<?php endforeach; ?>
+  <?php endforeach; ?>
 
-</div>
-<div style="text-align:center; margin-top:30px;">
-  <button onclick="location.href='result_members.html'">
-    結果画面に戻る
-  </button>
+  <div class="btn-area">
+    <button class="btn-back" onclick="location.href='result_members.html'">
+      ←結果画面に戻る
+    </button>
+  </div>
 </div>
 <script src="../js/op_background_move.js"></script>
 </body>
