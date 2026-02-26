@@ -180,10 +180,10 @@ function playAgain() {
     const stage = getStageNo();
     const playMode = localStorage.getItem('playMode') || 'multi';
     const stageMap = {
-        1: 'sugoroku_members_play.html?stage=1',
-        2: 'quiz_mountain_members.html?stage=2',
-        3: 'sugoroku_ultraman_member.html?stage=3',
-        4: 'world_members.html?stage=4'
+        1: 'sugoroku_members_play.html',
+        2: 'quiz_mountain_members.html',
+        3: 'sugoroku_ultraman_member.html',
+        4: 'world_members.html',
     };
     if (stage && stageMap[stage]) {
         window.location.href = stageMap[stage];
