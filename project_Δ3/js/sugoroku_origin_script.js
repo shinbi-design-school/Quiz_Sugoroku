@@ -89,7 +89,7 @@ const quizData = {
   32: { question: 'JavaScriptで文字列を結合する演算子は？', options: ['-', '+', '*', '/'], answer: 1, explanation: '+ 演算子で文字列を結合します！' },
   33: { question: 'PHPで配列の要素数を取得する関数は？', options: ['size()', 'length()', 'count()', 'total()'], answer: 2, explanation: 'count() 関数で配列の要素数を取得します！' },
   34: { question: 'CSSで要素の位置を設定するプロパティは？', options: ['top', 'display', 'float', 'position'], answer: 3, explanation: 'position プロパティで位置を設定します！' },
-  35: { question: 'HTMLでフォームの入力フィールドを作成するタグは？', options: ['<input>', '<form>', '<label>', '<button>'], answer: 0, explanation: '&lt;<input>&gt; タグが入力フィールドを作成します！' },
+  35: { question: 'HTMLでフォームの入力フィールドを作成するタグは？', options: ['<input>', '<form>', '<label>', '<button>'], answer: 0, explanation: '&lt;input&gt; タグが入力フィールドを作成します！' },
   36: { question: 'JavaScriptでループ処理を終了するキーワードは？', options: ['stop', 'continue', 'exit', 'break'], answer: 3, explanation: 'break キーワードでループ処理を終了します！' },
   37: { question: 'PHPで文字列を大文字に変換する関数は？', options: ['strtoupper()', 'strtolower()', 'ucfirst()', 'lcfirst()'], answer: 0, explanation: 'strtoupper() 関数で文字列を大文字に変換します！' },
   38: { question: 'CSSで要素の透明度を設定するプロパティは？', options: ['opacity', 'visibility', 'display', 'filter'], answer: 0, explanation: 'opacity プロパティで透明度を設定します！' },
